@@ -137,6 +137,42 @@ python basic_pipelines/depth.py
 To close the application, press `Ctrl+C`.
 See Detection Example above for additional input options examples.
 
+### Face Recognition Example
+Face recognition application with detection and classification of faces.
+
+#### Run the face recognition example:
+```bash
+python basic_pipelines/face_recognition.py
+```
+To close the application, press `Ctrl+C`.
+
+### Multisource Example
+Multi-source video stream processing with detection and tracking.
+
+#### Run the multisource example:
+```bash
+python basic_pipelines/multisource.py
+```
+To close the application, press `Ctrl+C`.
+
+### ReID Multisource Example
+Multi-source video stream processing with person re-identification.
+
+#### Run the ReID multisource example:
+```bash
+python basic_pipelines/reid_multisource.py
+```
+To close the application, press `Ctrl+C`.
+
+### Tiling Example
+Object detection with tiling for high-resolution images.
+
+#### Run the tiling example:
+```bash
+python basic_pipelines/tiling.py
+```
+To close the application, press `Ctrl+C`.
+
 ### Community Projects
 
 Get involved and make your mark! Explore our Community Projects and start contributing today, because together, we build better things! 🚀
