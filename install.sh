@@ -1,327 +1,552 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env bash
+set -uo pipefail
 
-# —————————————————————————————
-# 0. Parse flags
-# —————————————————————————————
-NO_INSTALLATION=false
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+DOWNLOAD_GROUP="default"
+VENV_NAME="venv_hailo_rpi_examples"
 PYHAILORT_PATH=""
 PYTAPPAS_PATH=""
-DOWNLOAD_ALL="default"  # Default to false unless --all is specified
+NO_INSTALL=false
+NO_SYSTEM_PYTHON=false
+ENV_FILE="${SCRIPT_DIR}/.env"
+CONFIG_FILE="${SCRIPT_DIR}/config/config.yaml"
+
+# Detect if running with sudo and get original user and group
+if [[ ${EUID:-$(id -u)} -eq 0 ]]; then
+  if [[ -z "${SUDO_USER:-}" ]]; then
+    echo "❌ This script must not be run as root directly. Please run with sudo as a regular user:"
+    echo "   sudo $0"
+    exit 1
+  fi
+  ORIGINAL_USER="${SUDO_USER}"
+  # Get the primary group of the original user
+  ORIGINAL_GROUP=$(id -gn "${SUDO_USER}")
+else
+  echo "❌ This script requires sudo privileges. Please run with sudo:"
+  echo "   sudo $0 $*"
+  exit 1
+fi
+
+echo "🔍 Detected user: ${ORIGINAL_USER}"
+echo "🔍 Detected primary group: ${ORIGINAL_GROUP}"
+
+# Check if group name is different from username
+if [[ "${ORIGINAL_USER}" == "${ORIGINAL_GROUP}" ]]; then
+  echo "✅ User's primary group matches username"
+else
+  echo "✅ User's primary group is different from username: ${ORIGINAL_GROUP}"
+fi
+
+as_original_user() {
+  if [[ ${EUID:-$(id -u)} -eq 0 && -n "${SUDO_USER:-}" ]]; then
+    sudo -n -u "$SUDO_USER" -H -- "$@"
+  else
+    "$@"
+  fi
+}
+
+# Function to fix ownership of files/directories to original user and group
+fix_ownership() {
+  local target="$1"
+  if [[ -e "$target" ]]; then
+    sudo chown -R "${ORIGINAL_USER}:${ORIGINAL_GROUP}" "$target" 2>/dev/null || true
+  fi
+}
+
+show_help() {
+    cat << EOF
+Usage: sudo $0 [OPTIONS]
+
+Install Hailo RPI5 Examples with virtual environment setup.
+
+⚠️  This script MUST be run with sudo.
+
+OPTIONS:
+    -n, --venv-name NAME        Set virtual environment name (default: venv_hailo_rpi_examples)
+    -ph, --pyhailort PATH       Path to custom PyHailoRT wheel file
+    -pt, --pytappas PATH        Path to custom PyTappas wheel file
+    --all                       Download all available models/resources
+    -x, --no-install           Skip installation of Python packages
+    --no-system-python         Don't use system site-packages (default: use system site-packages)
+    -h, --help                  Show this help message and exit
+
+EXAMPLES:
+    sudo $0                          # Basic installation with default settings
+    sudo $0 -n my_venv               # Use custom virtual environment name
+    sudo $0 --all                    # Install with all models/resources
+    sudo $0 -x                       # Skip Python package installation
+    sudo $0 --no-system-python       # Don't use system site-packages
+    sudo $0 -ph /path/to/pyhailort.whl -pt /path/to/pytappas.whl  # Use custom wheel files
+
+DESCRIPTION:
+    This script sets up a Python virtual environment for Hailo RPI5 Examples.
+    It checks for required Hailo components (driver, HailoRT, TAPPAS) and installs
+    missing Python bindings in the virtual environment.
+
+    The script will:
+    1. Detect the original user and their primary group
+    2. Check installed Hailo components
+    3. Create/recreate virtual environment
+    4. Install hailo-apps-infra package
+    5. Install required Python packages
+    6. Download models and resources
+    7. Run post-installation setup
+    8. Set correct ownership for all created files
+
+    Operations requiring root privileges (like creating directories in /usr/local)
+    are executed with sudo, while all other operations are executed as the original user.
+
+REQUIREMENTS:
+    - Must be run with sudo
+    - Hailo PCI driver must be installed
+    - HailoRT must be installed
+    - TAPPAS core must be installed
+
+    Use 'sudo ./scripts/hailo_installer.sh' to install missing components.
+
+EOF
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -n|--no-installation)
-      NO_INSTALLATION=true
-      shift
+    -n|--venv-name)
+      VENV_NAME="$2"
+      shift 2
       ;;
-    -h|--pyhailort)
+    -ph|--pyhailort)
       PYHAILORT_PATH="$2"
       shift 2
       ;;
-    -p|--pytappas)
+    -pt|--pytappas)
       PYTAPPAS_PATH="$2"
       shift 2
       ;;
     --all)
-      DOWNLOAD_ALL="all"
+      DOWNLOAD_GROUP="all"
       shift
+      ;;
+    -x | --no-install)
+      NO_INSTALL=true
+      echo "Skipping installation of Python packages."
+      shift
+      ;;
+    --no-system-python)
+      NO_SYSTEM_PYTHON=true
+      shift
+      ;;
+    -h|--help)
+      show_help
+      exit 0
       ;;
     *)
       echo "Unknown option: $1"
+      echo "Use -h or --help for usage information."
       exit 1
       ;;
-
   esac
 done
 
-# —————————————————————————————
-# 1. Read config
-# —————————————————————————————
-CONFIG_FILE="config.yaml"
-if [[ -n "$CONFIG_FILE" ]]; then
-  echo "📄 Loading configuration from $CONFIG_FILE"
-    while IFS= read -r line; do
-    # 1) Remove any inline comment (everything from the first unescaped “#” to end of line)
-    line="${line%%#*}"
+echo ""
+echo "📋 Checking installed Hailo packages..."
 
-    # 2) Skip blank lines
-    [[ -z "${line//[[:space:]]/}" ]] && continue
+SUMMARY_LINE=$(
+  as_original_user ./scripts/check_installed_packages.sh 2>&1 \
+    | sed -n 's/^SUMMARY: //p'
+)
 
-    # 3) Split on the *first* colon
-    key=${line%%:*}
-    val=${line#*:}
-
-    # 4) Trim whitespace and surrounding quotes
-    key=$(echo "$key" | xargs)
-    val=$(echo "$val" | sed -e 's/^[[:space:]]*"\{0,1\}//' \
-                            -e 's/"\{0,1\}[[:space:]]*$//')
-
-
-    case "$key" in
-      server_url)          server_url="$val"          ;;
-      storage_dir)         storage_dir="$val"         ;;
-      hailort_version)     hailort_version="$val"     ;;
-      tappas_version)      tappas_version="$val"      ;;
-      virtual_env_name)    virtual_env_name="$val"    ;;
-      hailo_apps_infra_repo_url)   hailo_apps_infra_repo_url="$val"   ;;
-      hailo_apps_infra_branch_tag) hailo_apps_infra_branch_tag="$val" ;;
-      hailo_apps_infra_path)  hailo_apps_infra_path="$val"  ;;
-      tappas_variant) tappas_variant="$val" ;;
-      # you can add more mappings here…
-    esac
-  done < <(grep -E '^[[:space:]]*[a-z_]+:' "$CONFIG_FILE")
-fi
-# —————————————————————————————
-# 2. Fallback to old defaults
-# —————————————————————————————
-: "${server_url:=http://dev-public.hailo.ai/2025_01}"
-: "${storage_dir:=hailo_temp_resources}"
-: "${hailort_version:=4.20.0}"
-: "${tappas_version:=3.31.0}"
-: "${virtual_env_name:="hailo_venv"}"
-: "${hailo_apps_infra_repo_url:=https://github.com/hailo-ai/hailo-apps-infra.git}"
-: "${hailo_apps_infra_branch_tag:=dev}"
-: "${hailo_apps_infra_path:="auto"}"  # or "auto" for latest
-: "${tappas_variant:="hailo-tappas-core"}"  # or "x86_64"
-
-# Ensure all required variables are set
-if [[ "$hailo_apps_infra_branch_tag" == "auto" ]] && [[ "$hailo_apps_infra_path" == "auto" ]]; then
-  echo "❌ Please set 'hailo_apps_infra_repo_url', 'hailo_apps_infra_branch_tag', and 'hailo_apps_infra_path' in the config."
-  echo "Using hailo_apps_infra_branch_tag = dev because auto was set."
-  hailo_apps_infra_branch_tag="dev"
-fi
-
-# Now use those
-BASE_URL="$server_url"
-DOWNLOAD_DIR="$storage_dir"
-HAILORT_VERSION="$hailort_version"
-TAPPAS_CORE_VERSION="$tappas_version"
-VENV_NAME="$virtual_env_name"
-HAILO_INFRA_PATH="$hailo_apps_infra_path"
-TAPPAS_PIP_PKG="$tappas_variant"
-
-# —————————————————————————————
-# Rest of your existing checks & installs…
-# —————————————————————————————
-
-echo "Using config from $CONFIG_FILE (or defaults):"
-echo "  BASE_URL           = $BASE_URL"
-echo "  DOWNLOAD_DIR       = $DOWNLOAD_DIR"
-echo "  HAILORT_VERSION    = $HAILORT_VERSION"
-echo "  TAPPAS_CORE_VERSION= $TAPPAS_CORE_VERSION"
-echo "  VENV_NAME          = $VENV_NAME"
-echo "  Hailo-Apps-Infra   = $hailo_apps_infra_repo_url @ $hailo_apps_infra_branch_tag"
-echo "  TAPPAS_PIP_PKG     = $TAPPAS_PIP_PKG"
-echo "  TAPPAS_VARIANT     = $tappas_variant"
-echo "  HAILO_INFRA_PATH   = $HAILO_INFRA_PATH"
-echo "  CONFIG_FILE        = $CONFIG_FILE"
-
-
-###——— HELPERS —————————————————————————————————————————————————————
-detect_system_pkg_version() {
-  dpkg -l | grep "$1" | awk '$1=="ii" { print $3; exit }'
-}
-
-
-detect_pip_pkg_version() {
-  if pip show "$1" >/dev/null 2>&1; then
-    pip show "$1" \
-      | awk -F': ' '/^Version: /{print $2; exit}'
-  else
-    echo ""
-  fi
-}
-
-check_system_pkg() {
-  pkg="$1"
-  ver=$(detect_system_pkg_version "$pkg")
-  if [[ -z "$ver" ]]; then
-    echo "❌ System package '$pkg' not found."
-    echo "    Please install it before proceeding."
-    exit 1
-  else
-    echo "✅ $pkg (system) version: $ver"
-  fi
-}
-
-###——— SYSTEM PKG CHECKS —————————————————————————————————————————————
-echo
-echo "📋 Checking required system packages…"
-check_system_pkg hailort
-
-echo
-echo "📋 Checking for HailoRT system version"
-HRT_VER=$(detect_system_pkg_version hailort)
-echo "📋 Checking for hailo-tappas vs hailo-tappas-core…"
-HT1=$(detect_system_pkg_version hailo-tappas)
-echo $HT1
-HT2=$(detect_system_pkg_version hailo-tappas-core)
-echo $HT2
-HTC_VER="none"
-
-if [[ -n "$HT2" ]]; then
-  echo "✅ hailo-tappas-core version: $HT2"
-  TAPPAS_PIP_PKG="hailo-tappas-core-python-binding"
-  HTC_VER="$HT2"
-elif [[ -n "$HT1" ]]; then
-  echo "✅ hailo-tappas version: $HT1"
-  HTC_VER="$HT1"
-  TAPPAS_PIP_PKG="hailo-tappas"
-else
-  echo "❌ Neither hailo-tappas nor hailo-tappas-core is installed."
+if [[ -z "$SUMMARY_LINE" ]]; then
+  echo "❌ Could not find SUMMARY line" >&2
   exit 1
 fi
 
+IFS=' ' read -r -a pairs <<< "$SUMMARY_LINE"
 
-###——— PIP PKG CHECKS —————————————————————————————————————————————————
-echo
-echo "📋 Checking host-Python pip packages…"
-INSTALL_PYHAILORT=false
+DRIVER_VERSION="${pairs[0]#*=}"
+HAILORT_VERSION="${pairs[1]#*=}"
+PYHAILORT_VERSION="${pairs[2]#*=}"
+TAPPAS_CORE_VERSION="${pairs[3]#*=}"
+PYTAPPAS_VERSION="${pairs[4]#*=}"
+
+INSTALL_HAILORT=false
 INSTALL_TAPPAS_CORE=false
 
-# hailort
-host_py=$(detect_pip_pkg_version hailort)
-if [[ -z "$host_py" ]]; then
-  echo "⚠️  pip 'hailort' missing; will install in venv."
-  INSTALL_PYHAILORT=true
-else
-  echo "✅ pip 'hailort' version: $host_py"
+if [[ "$DRIVER_VERSION" == "-1" ]]; then
+  echo "❌ Hailo PCI driver is not installed. Please install it first."
+  echo "To install the driver, run:"
+  echo "    sudo ./scripts/hailo_installer.sh"
+  exit 1
+fi
+if [[ "$HAILORT_VERSION" == "-1" ]]; then
+  echo "❌ HailoRT is not installed. Please install it first."
+  echo "To install HailoRT, run:"
+  echo "    sudo ./scripts/hailo_installer.sh"
+  exit 1
+fi
+if [[ "$TAPPAS_CORE_VERSION" == "-1" ]]; then
+  echo "❌ TAPPAS is not installed. Please install it first."
+  echo "To install TAPPAS, run:"
+  echo "    sudo ./scripts/hailo_installer.sh"
+  exit 1
 fi
 
-# tappas binding pkg (RPi vs x86)
-host_tc=$(detect_pip_pkg_version "$TAPPAS_PIP_PKG")
-if [[ -z "$host_tc" ]]; then
-  echo "⚠️  pip '$TAPPAS_PIP_PKG' missing; will install in venv."
+if [[ "$PYHAILORT_VERSION" == "-1" ]]; then
+  echo "❌ Python HailoRT binding is not installed."
+  echo "Will be installed in the virtualenv."
+  INSTALL_HAILORT=true
+fi
+if [[ "$PYTAPPAS_VERSION" == "-1" ]]; then
+  echo "❌ Python TAPPAS binding is not installed."
+  echo "Will be installed in the virtualenv."
   INSTALL_TAPPAS_CORE=true
-else
-  echo "✅ pip '$TAPPAS_PIP_PKG' version: $host_tc"
 fi
 
-if [[ "$NO_INSTALLATION" == true ]]; then
-  echo "⚠️  Skipping installation due to --no-installation flag."
-  INSTALL_PYHAILORT=false
+if [[ "$NO_INSTALL" = true ]]; then
+  echo "Skipping installation of Python packages."
+  INSTALL_HAILORT=false
   INSTALL_TAPPAS_CORE=false
-else
-  echo "📦 Will install missing pip packages in virtualenv."
 fi
 
+VENV_PATH="${SCRIPT_DIR}/${VENV_NAME}"
+
+# Detect architecture
+ARCH=$(uname -m)
+IS_X86=false
+if [[ "$ARCH" == "x86_64" || "$ARCH" == "i386" || "$ARCH" == "i686" ]]; then
+  IS_X86=true
+fi
+
+# Determine whether to use system site-packages
+USE_SYSTEM_SITE_PACKAGES=true
+if [[ "$NO_SYSTEM_PYTHON" = true ]]; then
+  USE_SYSTEM_SITE_PACKAGES=false
+  echo "🔧 Using --no-system-python flag: virtualenv will not use system site-packages"
+else
+  echo "🔧 Using system site-packages for virtualenv"
+fi
+
+if [[ -d "${VENV_PATH}" ]]; then
+  echo "🗑️  Removing existing virtualenv at ${VENV_PATH}"
+  # Try removing as regular user first, fallback to sudo if needed
+  if ! as_original_user rm -rf "${VENV_PATH}" 2>/dev/null; then
+    echo "  ⚠️  Regular user removal failed, fixing ownership..."
+    fix_ownership "${VENV_PATH}"
+    as_original_user rm -rf "${VENV_PATH}"
+  fi
+fi
+
+echo "🧹 Cleaning up build artifacts..."
+# Try cleaning as regular user first, fallback to sudo if needed
+if ! as_original_user find . -name "*.egg-info" -type d -exec rm -rf {} + 2>/dev/null; then
+  echo "  ⚠️  Regular user cleanup failed, fixing ownership..."
+  fix_ownership .
+  as_original_user find . -name "*.egg-info" -type d -exec rm -rf {} + 2>/dev/null || true
+fi
+
+if ! as_original_user rm -rf build/ dist/ 2>/dev/null; then
+  echo "  ⚠️  Regular user cleanup failed, fixing ownership..."
+  fix_ownership .
+  as_original_user rm -rf build/ dist/ 2>/dev/null || true
+fi
+echo "✅ Build artifacts cleaned"
+
+# Remove existing .env file if it exists
+if [[ -f "${ENV_FILE}" ]]; then
+  echo "🗑️  Removing existing .env file at ${ENV_FILE}"
+  if ! as_original_user rm -f "${ENV_FILE}" 2>/dev/null; then
+    echo "  ⚠️  Regular user removal failed, fixing ownership..."
+    fix_ownership "${ENV_FILE}"
+    as_original_user rm -f "${ENV_FILE}"
+  fi
+fi
+
+# Create .env file with proper ownership and permissions
+as_original_user touch "${ENV_FILE}"
+as_original_user chmod 644 "${ENV_FILE}"
+echo "✅ Created .env file at ${ENV_FILE}"
+
+echo ""
+echo "📦 Installing system dependencies..."
+sudo apt-get install -y meson python3-gi python3-gi-cairo
+
+# Create virtual environment with or without system site-packages
+if [[ "$USE_SYSTEM_SITE_PACKAGES" = true ]]; then
+  echo "🌱 Creating virtualenv '${VENV_NAME}' (with system site-packages)…"
+  as_original_user python3 -m venv --system-site-packages "${VENV_PATH}"
+else
+  echo "🌱 Creating virtualenv '${VENV_NAME}' (without system site-packages)…"
+  as_original_user python3 -m venv "${VENV_PATH}"
+fi
+
+if [[ ! -f "${VENV_PATH}/bin/activate" ]]; then
+  echo "❌ Could not find activate at ${VENV_PATH}/bin/activate"
+  exit 1
+fi
+
+echo "🔌 Activating venv: ${VENV_NAME}"
+
+# Install custom wheels if provided
 if [[ -n "$PYHAILORT_PATH" ]]; then
-  echo "📦 Using custom hailort path: $PYHAILORT_PATH"
-  INSTALL_PYHAILORT=true
+  echo "Using custom HailoRT Python binding path: $PYHAILORT_PATH"
+  if [[ ! -f "$PYHAILORT_PATH" ]]; then
+    echo "❌ HailoRT Python binding not found at $PYHAILORT_PATH"
+    exit 1
+  fi
+  as_original_user bash -c "source '${VENV_PATH}/bin/activate' && pip install '$PYHAILORT_PATH'"
+  INSTALL_HAILORT=false
 fi
 if [[ -n "$PYTAPPAS_PATH" ]]; then
-  echo "📦 Using custom tappas path: $PYTAPPAS_PATH"
-  INSTALL_TAPPAS_CORE=true
+  echo "Using custom TAPPAS Python binding path: $PYTAPPAS_PATH"
+  if [[ ! -f "$PYTAPPAS_PATH" ]]; then
+    echo "❌ TAPPAS Python binding not found at $PYTAPPAS_PATH"
+    exit 1
+  fi
+  as_original_user bash -c "source '${VENV_PATH}/bin/activate' && pip install '$PYTAPPAS_PATH'"
+  INSTALL_TAPPAS_CORE=false
 fi
 
-sudo apt install python3-gi python3-gi-cairo
-
-
-###——— VENV SETUP —————————————————————————————————————————————————————
-arch=$(grep -q "Raspberry Pi" /proc/device-tree/model 2>/dev/null && echo "rpi" || uname -m)
-echo "$arch"
-
-echo
-if [[ -d "$VENV_NAME" ]]; then
-  echo "✅ Virtualenv '$VENV_NAME' exists. Activating…"
-  source "$VENV_NAME/bin/activate"
-else
-  echo "🔧 Creating virtualenv '$VENV_NAME'…"
-  python3 -m venv --system-site-packages "$VENV_NAME"
-  echo "✅ Created. Activating…"
-  source "$VENV_NAME/bin/activate"
-fi
-
-
-###——— INSTALL MISSING PIP PACKAGES —————————————————————————————————————
-echo
-echo "📦 Installing missing pip packages…"
-
-
-# pyhailort
-if $INSTALL_PYHAILORT; then
-  if [[ -n "$PYHAILORT_PATH" ]]; then
-    echo "📦 Installing 'hailort' from local path: $PYHAILORT_PATH"
-    pip install "$PYHAILORT_PATH"
-  else
-    echo "📦 Installing 'hailort' via helper script"
-    ./hailo_python_installation.sh --only-hailort
+# Detect Hailo architecture for python installation
+HAILO_ARCH="hailo8"
+if command -v hailortcli >/dev/null 2>&1; then
+  ARCH_OUTPUT=$(hailortcli fw-control identify 2>/dev/null || echo "")
+  if echo "$ARCH_OUTPUT" | grep -qi "hailo8l"; then
+    HAILO_ARCH="hailo8l"
+  elif echo "$ARCH_OUTPUT" | grep -qi "hailo10"; then
+    HAILO_ARCH="hailo10"
   fi
 fi
+echo "📋 Detected Hailo architecture: ${HAILO_ARCH}"
 
-# pytappas (tappas-core or tappas binding)
-if $INSTALL_TAPPAS_CORE; then
-  if [[ -n "$PYTAPPAS_PATH" ]]; then
-    echo "📦 Installing '$TAPPAS_PIP_PKG' from local path: $PYTAPPAS_PATH"
-    pip install "$PYTAPPAS_PATH"
-  else
-    echo "📦 Installing '$TAPPAS_PIP_PKG' via helper script"
-    ./hailo_python_installation.sh --only-tappas
+# Install missing Hailo Python packages
+if [[ "$INSTALL_HAILORT" = true ]] || [[ "$INSTALL_TAPPAS_CORE" = true ]]; then
+  echo '📦 Installing Python Hailo packages…'
+  FLAGS="--hw-arch=${HAILO_ARCH}"
+  
+  if [[ "$INSTALL_TAPPAS_CORE" = true ]]; then
+    echo "Installing TAPPAS core Python binding"
+    FLAGS="${FLAGS} --tappas-core-version=${TAPPAS_CORE_VERSION}"
   fi
-fi
+  if [[ "$INSTALL_HAILORT" = true ]]; then
+    echo "Installing HailoRT Python binding"
+    FLAGS="${FLAGS} --hailort-version=${HAILORT_VERSION}"
+  fi
 
-# If neither was missing, you can still echo:
-if ! $INSTALL_PYHAILORT && ! $INSTALL_TAPPAS_CORE; then
-  echo "✅ All pip packages are already installed."
-fi
-
-
-
-###——— ENV FILE —————————————————————————————————————————————————————
-ENV_FILE=".env"
-ENV_PATH="$(pwd)/$ENV_FILE"
-export HAILO_ENV_FILE="${ENV_PATH}"
-echo $HAILO_ENV_FILE
-
-CONFIG_PATH="$(pwd)/$CONFIG_FILE"
-
-# Step 1: Create the .env file if it doesn't exist
-if [[ ! -f "$ENV_PATH" ]]; then
-    echo "🔧 Creating .env file at $ENV_PATH"
-    touch "$ENV_PATH"
-    chmod 666 "$ENV_PATH"  # rw-rw-r-- for user/group
+  echo "Installing Hailo Python packages with flags: ${FLAGS}"
+  as_original_user bash -c "source '${VENV_PATH}/bin/activate' && ./scripts/hailo_python_installation.sh ${FLAGS}"
 else
-    echo "✅ .env already exists at $ENV_PATH"
-    chmod 666 "$ENV_PATH"
+  echo "✅ All Hailo Python packages are already installed or skipped."
 fi
 
-
-###——— MODULE INSTALLS ———————————————————————————————————————————————————
-echo
+echo ""
 echo "📦 Upgrading pip/setuptools/wheel…"
-pip install --upgrade pip setuptools wheel
-pip install "py>=1.8.0"
+as_original_user bash -c "source '${VENV_PATH}/bin/activate' && python3 -m pip install --upgrade pip setuptools wheel"
 
+echo "📦 Installing requirements.txt..."
+as_original_user bash -c "source '${VENV_PATH}/bin/activate' && pip install -r requirements.txt"
 
-pip install -r requirements.txt
-echo $"📦 Installing Hailo-Apps-Infra… $HAILO_INFRA_PATH"
-if [[ "$HAILO_INFRA_PATH" != "auto" ]]; then
-  echo "📦 Installing Hailo-Apps-Infra from $HAILO_INFRA_PATH…"
-  pip install -e "$HAILO_INFRA_PATH"
-else
-    echo "📦 Installing hailo-apps-infra from Git ($hailo_apps_infra_branch_tag)…"
-    pip install "git+${hailo_apps_infra_repo_url}@${hailo_apps_infra_branch_tag}#egg=hailo-apps"
+echo "📦 Installing hailo-apps-infra package..."
+
+# Read config to get hailo-apps-infra settings
+HAILO_APPS_INFRA_REPO_URL="https://github.com/hailo-ai/hailo-apps-infra.git"
+HAILO_APPS_INFRA_BRANCH_TAG="25.10.0"
+HAILO_APPS_INFRA_PATH="auto"
+
+if [[ -f "$CONFIG_FILE" ]]; then
+  echo "📄 Loading configuration from $CONFIG_FILE"
+  while IFS= read -r line; do
+    # Remove comments and blank lines
+    line="${line%%#*}"
+    [[ -z "${line//[[:space:]]/}" ]] && continue
+    
+    # Split on first colon
+    key=${line%%:*}
+    val=${line#*:}
+    
+    # Trim whitespace and quotes
+    key=$(echo "$key" | xargs)
+    val=$(echo "$val" | sed -e 's/^[[:space:]]*"\{0,1\}//' -e 's/"\{0,1\}[[:space:]]*$//')
+    
+    case "$key" in
+      hailo_apps_infra_repo_url)   HAILO_APPS_INFRA_REPO_URL="$val"   ;;
+      hailo_apps_infra_branch_tag) HAILO_APPS_INFRA_BRANCH_TAG="$val" ;;
+      hailo_apps_infra_path)       HAILO_APPS_INFRA_PATH="$val"       ;;
+    esac
+  done < <(grep -E '^[[:space:]]*[a-z_]+:' "$CONFIG_FILE")
 fi
 
+echo "  Repo URL: $HAILO_APPS_INFRA_REPO_URL"
+echo "  Branch/Tag: $HAILO_APPS_INFRA_BRANCH_TAG"
+echo "  Local Path: $HAILO_APPS_INFRA_PATH"
 
-echo "📦 Installing shared runtime deps…"
+if [[ "$HAILO_APPS_INFRA_PATH" != "auto" && -d "$HAILO_APPS_INFRA_PATH" ]]; then
+  echo "📦 Installing hailo-apps-infra from local path: $HAILO_APPS_INFRA_PATH"
+  as_original_user bash -c "source '${VENV_PATH}/bin/activate' && pip install -e '$HAILO_APPS_INFRA_PATH'"
+else
+  echo "📦 Installing hailo-apps-infra from Git (${HAILO_APPS_INFRA_BRANCH_TAG})…"
+  as_original_user bash -c "source '${VENV_PATH}/bin/activate' && pip install 'git+${HAILO_APPS_INFRA_REPO_URL}@${HAILO_APPS_INFRA_BRANCH_TAG}#egg=hailo-apps'"
+fi
 
+# Create Hailo resources directories with correct permissions
+echo "📁 Creating Hailo resources directories..."
 
-###——— POST-INSTALL ———————————————————————————————————————————————————
-echo
-echo "⚙️  Running post-install…"
-hailo-post-install \
-    --dotenv "$ENV_PATH" \
-    --config "$CONFIG_PATH" \
-    --group "$DOWNLOAD_ALL"
+RESOURCES_ROOT="/usr/local/hailo/resources"
 
+# Create the directory structure (requires sudo)
+sudo mkdir -p ${RESOURCES_ROOT}/models/{hailo8,hailo8l,hailo10h}
+sudo mkdir -p ${RESOURCES_ROOT}/{videos,so,photos,json,packages}
+sudo mkdir -p ${RESOURCES_ROOT}/face_recon/{train,samples}
 
-###——— FINISHED —————————————————————————————————————————————————————
-cat <<EOF
+# Set ownership to current user and their primary group
+sudo chown -R ${ORIGINAL_USER}:${ORIGINAL_GROUP} ${RESOURCES_ROOT}
 
-🎉  All done!
+# Set permissions: rwxr-xr-x for directories (775 for group access)
+sudo chmod -R 775 ${RESOURCES_ROOT}
 
-To setup your environment:
-    source setup_env.sh
+# Ensure the user can write to these directories
+sudo chmod -R u+w ${RESOURCES_ROOT}
 
-EOF
+echo "✅ Hailo resources directories created successfully"
+echo "   Owner: ${ORIGINAL_USER}:${ORIGINAL_GROUP}"
+echo "   Location: ${RESOURCES_ROOT}"
+
+echo ""
+echo "🔧 Running post-install script…"
+
+# Fix resources directory permissions if needed
+echo "🔍 Checking resources directory permissions..."
+if [[ -d "resources" ]]; then
+    # Check if it's a symlink and test the target directory
+    if [[ -L "resources" ]]; then
+        target_dir=$(readlink "resources")
+        echo "  🔗 Resources is a symlink pointing to: $target_dir"
+        # Test if user can write to the target directory
+        if ! as_original_user test -w "$target_dir" 2>/dev/null; then
+            echo "  ⚠️  Target directory requires sudo permissions, fixing ownership..."
+            fix_ownership "$target_dir"
+        fi
+        # Also fix the symlink itself
+        if ! as_original_user test -w "resources" 2>/dev/null; then
+            echo "  ⚠️  Symlink requires sudo permissions, fixing ownership..."
+            fix_ownership "resources"
+        fi
+    else
+        # It's a regular directory
+        if ! as_original_user test -w "resources" 2>/dev/null; then
+            echo "  ⚠️  Resources directory requires sudo permissions, fixing ownership..."
+            fix_ownership "resources"
+        fi
+    fi
+fi
+
+if ! as_original_user bash -c "source '${VENV_PATH}/bin/activate' && hailo-post-install --group '$DOWNLOAD_GROUP' --config '${CONFIG_FILE}'"; then
+    echo ""
+    echo "❌ Post-installation failed!"
+    echo "This usually means:"
+    echo "  - C++ compilation failed (check for permission issues in build directories)"
+    echo "  - Resource download failed (check network connection)"
+    echo "  - Environment setup failed"
+    echo ""
+    echo "Please check the error messages above and try again."
+    echo "If you see permission errors, you may need to clean up old build directories with sudo."
+    exit 1
+fi
+
+echo ""
+echo "🔍 Verifying installation..."
+
+# Verification function
+verify_installation() {
+    local success=true
+    
+    echo "  📁 Checking virtual environment..."
+    if [[ -f "${VENV_PATH}/bin/activate" ]]; then
+        echo "    ✅ Virtual environment created successfully"
+    else
+        echo "    ❌ Virtual environment not found"
+        success=false
+    fi
+    
+    echo "  🐍 Checking Python packages..."
+    if as_original_user bash -c "source '${VENV_PATH}/bin/activate' && python3 -c 'import hailo_apps; print(\"Hailo Apps version:\", hailo_apps.__file__)'" 2>/dev/null; then
+        echo "    ✅ Hailo Apps package installed successfully"
+    else
+        echo "    ❌ Hailo Apps package not properly installed"
+        success=false
+    fi
+    
+    echo "  📦 Checking HailoRT Python bindings..."
+    if as_original_user bash -c "source '${VENV_PATH}/bin/activate' && python3 -c 'import hailo; print(\"HailoRT available\")'" 2>/dev/null; then
+        echo "    ✅ HailoRT Python bindings available"
+    else
+        echo "    ⚠️  HailoRT Python bindings not available (may need system installation)"
+    fi
+    
+    echo "  📦 Checking TAPPAS Python bindings..."
+    if as_original_user bash -c "source '${VENV_PATH}/bin/activate' && python3 -c 'import hailo_platform; print(\"TAPPAS available\")'" 2>/dev/null; then
+        echo "    ✅ TAPPAS Python bindings available"
+    else
+        echo "    ⚠️  TAPPAS Python bindings not available (may need system installation)"
+    fi
+    
+    echo "  📁 Checking resources directory..."
+    if [[ -d "resources" && -L "resources" ]]; then
+        echo "    ✅ Resources symlink created successfully"
+        if [[ -d "resources/models" ]]; then
+            local model_count=$(find resources/models -name "*.hef" 2>/dev/null | wc -l)
+            echo "    ✅ Found $model_count model files"
+        else
+            echo "    ⚠️  Models directory not found"
+        fi
+    else
+        echo "    ❌ Resources directory not properly set up"
+        success=false
+    fi
+    
+    echo "  📄 Checking environment file..."
+    if [[ -f ".env" ]]; then
+        echo "    ✅ Environment file created successfully"
+    else
+        echo "    ❌ Environment file not found"
+        success=false
+    fi
+    
+    echo "  🔨 Checking C++ postprocess compilation..."
+    # Check for compiled C++ libraries in the expected location
+    if [[ -d "/usr/local/hailo/resources/so" ]]; then
+        local so_count=$(find /usr/local/hailo/resources/so -name "*.so" 2>/dev/null | wc -l)
+        if [[ $so_count -gt 0 ]]; then
+            echo "    ✅ Found $so_count compiled C++ postprocess libraries"
+        else
+            echo "    ⚠️  No compiled C++ postprocess libraries found"
+            echo "       This may affect some advanced features"
+        fi
+    else
+        echo "    ⚠️  C++ library directory not found"
+        echo "       This may affect some advanced features"
+    fi
+    
+    return 0
+}
+
+# Run verification
+verify_installation
+
+# Final ownership fix for all project files
+echo ""
+echo "🔧 Ensuring all project files have correct ownership..."
+fix_ownership "${SCRIPT_DIR}"
+echo "✅ Project files ownership fixed to ${ORIGINAL_USER}:${ORIGINAL_GROUP}"
+
+echo ""
+echo "✅ Installation process completed!"
+echo "Virtual environment: ${VENV_NAME}"
+echo "Location: ${VENV_PATH}"
+echo "User: ${ORIGINAL_USER}"
+echo "Group: ${ORIGINAL_GROUP}"
+
+echo ""
+echo "✅ All done! Your package is now in '${VENV_NAME}'."
+echo ""
+echo "To setup your environment, run:"
+echo "    source setup_env.sh"
+echo ""
