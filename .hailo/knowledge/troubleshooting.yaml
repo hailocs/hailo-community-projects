@@ -1,0 +1,332 @@
+# ============================================================================
+# TROUBLESHOOTING - Common errors and fixes for Hailo app development
+# ============================================================================
+# Each entry documents an error pattern, its cause, and how to fix it.
+# Referenced by SKILL.md error recovery section.
+
+entries:
+
+  # --------------------------------------------------------------------------
+  # HEF / Model Errors
+  # --------------------------------------------------------------------------
+
+  - error: "Failed to load HEF file"
+    symptom: "App crashes at startup with HEF loading error or FileNotFoundError on .hef path"
+    cause: "The HEF model file has not been downloaded or the path is incorrect. Models are not bundled with the repo -- they must be downloaded via resources_config.yaml."
+    fix: |
+      1. Run `hailo-download-resources` to download all configured HEF files.
+      2. Verify the model name matches an entry in hailo-apps-infra/hailo_apps/config/resources_config.yaml.
+      3. If using --hef-path, check the path exists: `ls -la <hef_path>`.
+      4. Use --list-models to see available models for your app and architecture.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "Model not available for architecture"
+    symptom: "resolve_hef_path returns None or logs 'No HEF found for arch hailo8l'"
+    cause: "Not all models are compiled for all architectures. Some models only have HEFs for hailo8 or hailo10h."
+    fix: |
+      1. Check resources_config.yaml for the model's supported architectures.
+      2. Use --list-models to see which models are available for your target arch.
+      3. Consider an alternative model (e.g., yolov8s instead of yolov8m for hailo8l).
+      4. For GenAI models, they are Hailo-10H only -- no hailo8/hailo8l support.
+    phase: "Phase 2 (Recommendation)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "HEF input shape mismatch"
+    symptom: "Inference produces garbage output or the pipeline negotiation fails with resolution errors"
+    cause: "The input frame resolution does not match the model's expected input shape. The INFERENCE_PIPELINE_WRAPPER handles this for pipeline apps, but standalone apps must preprocess manually."
+    fix: |
+      1. For pipeline apps: ensure INFERENCE_PIPELINE_WRAPPER is used for resolution preservation.
+      2. For standalone apps: check hailo_inference.get_input_shape() and resize frames accordingly.
+      3. Verify the model expects the correct color format (RGB vs BGR).
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline, standalone]
+
+  # --------------------------------------------------------------------------
+  # Postprocess Errors
+  # --------------------------------------------------------------------------
+
+  - error: "Failed to load postprocess .so"
+    symptom: "GStreamer error: 'Failed to load shared library' or 'cannot open shared object file'"
+    cause: "The postprocess .so file has not been compiled, or the path is wrong. C++ postprocess plugins must be built before use."
+    fix: |
+      1. Run `hailo-compile-postprocess` to build all C++ postprocess plugins.
+      2. Verify the .so filename matches what's in your pipeline class (e.g., libyolo_hailortpp_postprocess.so).
+      3. Check that RESOURCES_SO_DIR_NAME is correctly imported and used in get_resource_path().
+      4. Run: find hailo-apps-infra/ -name "*.so" | grep <your_postprocess_name>
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline]
+
+  - error: "Wrong postprocess function name"
+    symptom: "GStreamer critical warning: 'function not found in shared library' or silently produces no detections"
+    cause: "The post_function_name passed to INFERENCE_PIPELINE does not match an exported function in the .so file."
+    fix: |
+      1. Check app_catalog.yaml for the correct postprocess_function for your model.
+      2. Common functions: 'filter' (generic), 'filter_letterbox' (with letterbox), 'yolov8s' (model-specific).
+      3. For YOLO models: use 'filter_letterbox' with the inference wrapper, 'filter' without.
+      4. Inspect the .so exports: nm -D <path_to_so> | grep <expected_function>
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  # --------------------------------------------------------------------------
+  # GStreamer Pipeline Errors
+  # --------------------------------------------------------------------------
+
+  - error: "No element 'hailonet' found"
+    symptom: "GStreamer error: 'no element hailonet' or 'Failed to create element hailonet'"
+    cause: "TAPPAS GStreamer plugins are not installed or not in the GST_PLUGIN_PATH. This happens when setup_env.sh was not sourced."
+    fix: |
+      1. Run: source setup_env.sh
+      2. Verify: gst-inspect-1.0 hailonet (should show element details)
+      3. If still missing, reinstall TAPPAS: ./install.sh
+      4. Check GST_PLUGIN_PATH includes the TAPPAS plugin directory.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline]
+
+  - error: "Pipeline error: not negotiated"
+    symptom: "GStreamer negotiation error, pipeline fails to start with 'not-negotiated' or 'caps mismatch'"
+    cause: "Two pipeline elements cannot agree on a format. Usually a missing videoconvert or videoscale between elements with incompatible caps."
+    fix: |
+      1. Add videoconvert between elements that need format conversion.
+      2. Use the helper functions (SOURCE_PIPELINE, DISPLAY_PIPELINE) which handle format conversion automatically.
+      3. Check that video_width and video_height match the source capabilities.
+      4. For USB cameras, try adding no_webcam_compression=True to SOURCE_PIPELINE.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline]
+
+  - error: "GStreamer element not found"
+    symptom: "Error creating element '<element_name>' or 'no such element or plugin'"
+    cause: "A GStreamer element referenced in the pipeline string is not installed."
+    fix: |
+      1. Check the element exists: gst-inspect-1.0 <element_name>
+      2. Common missing elements: fpsdisplaysink (gstreamer1.0-plugins-bad), v4l2src (gstreamer1.0-plugins-good).
+      3. Install missing GStreamer plugins: apt install gstreamer1.0-plugins-{good,bad,ugly}
+      4. For Hailo elements: source setup_env.sh and verify TAPPAS installation.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline]
+
+  # --------------------------------------------------------------------------
+  # Import / Environment Errors
+  # --------------------------------------------------------------------------
+
+  - error: "ModuleNotFoundError: No module named 'hailo_apps'"
+    symptom: "ImportError when running the app, hailo_apps package not found"
+    cause: "PYTHONPATH does not include the hailo-apps-infra directory. setup_env.sh sets this automatically."
+    fix: |
+      1. Run: source setup_env.sh
+      2. Verify: python3 -c "import hailo_apps; print(hailo_apps.__file__)"
+      3. If running from a different directory, ensure PYTHONPATH includes the repo root.
+      4. For community apps, the import path is: community.apps.<type>_apps.<app_name>
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "ModuleNotFoundError: No module named 'hailo'"
+    symptom: "ImportError on 'import hailo' -- the Hailo Python bindings are not installed"
+    cause: "The HailoRT Python bindings (hailo module) are not installed in the current Python environment."
+    fix: |
+      1. Source the environment: source setup_env.sh
+      2. Verify HailoRT installation: python3 -c "import hailo; print(hailo.__version__)"
+      3. If missing, install HailoRT following the Hailo Developer Zone instructions.
+      4. Ensure the venv matches the HailoRT installation (system Python vs venv).
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone]
+
+  # --------------------------------------------------------------------------
+  # Callback Errors
+  # --------------------------------------------------------------------------
+
+  - error: "Blocking callback causes pipeline stutter"
+    symptom: "Low FPS, stuttering video, or GStreamer queue overflow warnings"
+    cause: "The callback function performs heavy operations (file I/O, network calls, heavy CV operations) in the GStreamer streaming thread, blocking the pipeline."
+    fix: |
+      1. Move heavy operations to a separate thread or process.
+      2. Use queue.Queue to pass work items to a background worker.
+      3. Throttle console output: only print every N frames (frame_count % 30 == 0).
+      4. Avoid heavy OpenCV operations in the callback -- use hailooverlay or hailooverlay_community for rendering.
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  - error: "Double-counting frames (increment() called manually)"
+    symptom: "Frame count increases by 2 per frame, or counting statistics are doubled"
+    cause: "Calling user_data.increment() manually in the callback. The framework auto-increments the counter -- calling it again double-counts."
+    fix: |
+      1. Remove any calls to user_data.increment() in your callback.
+      2. Use user_data.get_count() to read the frame count -- it auto-increments.
+      3. The base class app_callback_class handles counting automatically.
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  - error: "Wrong callback signature"
+    symptom: "TypeError in callback, wrong number of arguments, or callback never fires"
+    cause: "The callback signature does not match what GStreamer identity element expects. Must be (element, buffer, user_data)."
+    fix: |
+      1. Ensure callback signature is: def app_callback(element, buffer, user_data)
+      2. NOT (pad, info, user_data) -- that is for probe callbacks, not identity handoff.
+      3. The element is the GStreamer identity element, buffer is GstBuffer, user_data is your callback class.
+    phase: "Phase 4.5 (Peer Review)"
+    app_types: [pipeline]
+
+  - error: "Wrong buffer format with get_numpy_from_buffer"
+    symptom: "Distorted or blank frame when extracting numpy array, or ValueError on reshape"
+    cause: "The format, width, height from get_caps_from_pad do not match the actual buffer data. This can happen if caps negotiation hasn't completed or the buffer is in an unexpected format."
+    fix: |
+      1. Always check: if format is not None and width is not None and height is not None
+      2. Ensure --use-frame flag is passed at runtime for frame extraction.
+      3. The frame is in RGB format from GStreamer -- convert to BGR for OpenCV: cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+      4. Use user_data.use_frame to check if frame extraction is enabled.
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  # --------------------------------------------------------------------------
+  # HailoRT Device Errors
+  # --------------------------------------------------------------------------
+
+  - error: "Failed to find Hailo device"
+    symptom: "HailoRT error: 'Failed to scan for devices' or 'No Hailo devices found'"
+    cause: "The Hailo accelerator is not connected, not recognized by the OS, or the driver is not loaded."
+    fix: |
+      1. Check device connection: lsusb | grep Hailo (for USB) or lspci | grep Hailo (for PCIe).
+      2. Check HailoRT driver: hailortcli fw-control identify
+      3. Verify permissions: ls -la /dev/hailo* (user must have access).
+      4. Reload driver if needed: sudo modprobe hailo_pci
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "Permission denied on /dev/hailo*"
+    symptom: "PermissionError or EPERM when accessing the Hailo device"
+    cause: "The current user does not have permission to access the Hailo device files."
+    fix: |
+      1. Add user to the hailo group: sudo usermod -aG hailo $USER
+      2. Set device permissions: sudo chmod 666 /dev/hailo*
+      3. Create a udev rule for persistent permissions.
+      4. Log out and back in for group changes to take effect.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "VDevice group_id conflict"
+    symptom: "Error creating VDevice, 'device is in use' or scheduling conflicts between models"
+    cause: "Multiple processes or models are trying to use the device without shared group_id, or a previous process didn't release the device."
+    fix: |
+      1. Use SHARED_VDEVICE_GROUP_ID from defines.py for all VDevice instances.
+      2. Always release resources in a finally block: vdevice.release()
+      3. Kill any orphaned processes: ps aux | grep hailo | grep -v grep
+      4. For multi-model pipelines, use multi_process_service=True in INFERENCE_PIPELINE.
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline, genai]
+
+  # --------------------------------------------------------------------------
+  # GenAI-Specific Errors
+  # --------------------------------------------------------------------------
+
+  - error: "GenAI SDK not available on Hailo-8/8L"
+    symptom: "ImportError: No module named 'hailo_platform.genai' on Hailo-8 or Hailo-8L"
+    cause: "The hailo_platform.genai module is only available for Hailo-10H hardware. LLM/VLM/Whisper models require the GenAI SDK."
+    fix: |
+      1. GenAI apps require Hailo-10H hardware -- there is no workaround for Hailo-8/8L.
+      2. Check hardware: hailortcli fw-control identify (look for device type).
+      3. For AI on Hailo-8/8L, use pipeline apps (detection, pose, etc.) or standalone apps.
+    phase: "Phase 2 (Recommendation)"
+    app_types: [genai]
+
+  - error: "Context window overflow"
+    symptom: "LLM generates garbage, repeats itself, or crashes with token limit error"
+    cause: "The conversation history exceeds the model's maximum context window. Qwen2.5-1.5B has a 32K token limit."
+    fix: |
+      1. Call llm.clear_context() to reset the KV cache between conversations.
+      2. Implement context management: track token count and clear when approaching limits.
+      3. See gen_ai_utils/llm_utils/context_manager.py for the ContextManager pattern.
+      4. Truncate old messages from the conversation list to stay within limits.
+    phase: "Phase 4 (Implementation)"
+    app_types: [genai]
+
+  - error: "Piper TTS model not found"
+    symptom: "TTS initialization fails with model not found, or voice output is silent"
+    cause: "The Piper TTS model files must be downloaded separately. They are not included with the GenAI SDK."
+    fix: |
+      1. Install GenAI extras: pip install -e ".[gen-ai]"
+      2. Download Piper model: follow voice_assistant README for model download instructions.
+      3. If TTS is not needed, use --no-tts flag (if supported) or remove TTS initialization.
+      4. TTS gracefully degrades to text-only output if model is not found.
+    phase: "Phase 5 (Testing)"
+    app_types: [genai]
+
+  # --------------------------------------------------------------------------
+  # Display Errors
+  # --------------------------------------------------------------------------
+
+  - error: "No display / DISPLAY not set"
+    symptom: "Cannot open display, Gtk initialization failed, or cv2.imshow crashes with 'could not initialize display'"
+    cause: "Running in a headless environment (SSH, Docker, server) without an X display."
+    fix: |
+      1. For pipeline apps: use fakesink sync=false in the pipeline string.
+      2. For standalone apps: use --no-display flag.
+      3. For remote access: use X11 forwarding (ssh -X) or set DISPLAY=:0.
+      4. Use FILE_SINK_PIPELINE to save output to file instead of displaying.
+      5. Set up a web control panel for remote monitoring.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline, standalone, genai]
+
+  - error: "Black screen / no video output"
+    symptom: "Display window opens but shows only black frames, no video content"
+    cause: "VAAPI hardware decode is interfering with the pipeline. Common on Intel/AMD systems where vaapidecodebin claims priority."
+    fix: |
+      1. Add at the top of your main .py file (before any GStreamer imports):
+         import os
+         os.environ["GST_PLUGIN_FEATURE_RANK"] = "vaapidecodebin:NONE"
+      2. This disables VAAPI decode and falls back to software decode.
+      3. The pipeline_app.md template includes this by default.
+    phase: "Phase 5 (Testing)"
+    app_types: [pipeline]
+
+  # --------------------------------------------------------------------------
+  # Tracker Errors
+  # --------------------------------------------------------------------------
+
+  - error: "No unique IDs / track_id always 0"
+    symptom: "All detections have track_id == 0, tracking is not working"
+    cause: "The TRACKER_PIPELINE is missing from the pipeline string, or class_id is filtering out the relevant class."
+    fix: |
+      1. Ensure TRACKER_PIPELINE is in the pipeline string between inference and callback.
+      2. Check class_id parameter: -1 tracks all classes, specific number tracks that class only.
+      3. Verify the tracker is processing detections: class_id must match the label index in your model.
+      4. If using keep_past_metadata=True, untracked detections still get track_id=0.
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  - error: "Tracker ID assignment issues / frequent ID switches"
+    symptom: "Objects get new IDs when they shouldn't, or IDs switch between nearby objects"
+    cause: "Tracker thresholds are not tuned for the scene. Too strict matching or too short keep-alive frames."
+    fix: |
+      1. Adjust TRACKER_PIPELINE parameters:
+         - kalman_dist_thr: increase for faster-moving objects (default varies)
+         - iou_thr: lower for more lenient matching
+         - keep_tracked_frames: increase to keep IDs longer during occlusion
+         - keep_lost_frames: increase to remember lost objects longer
+      2. Use keep_past_metadata=True for cascaded pipelines.
+      3. For very crowded scenes, consider using re-identification (reid_multisource pattern).
+    phase: "Phase 4 (Implementation)"
+    app_types: [pipeline]
+
+  # --------------------------------------------------------------------------
+  # Common Development Mistakes
+  # --------------------------------------------------------------------------
+
+  - error: "self.options instead of self.options_menu"
+    symptom: "AttributeError: 'GStreamerApp' object has no attribute 'options'"
+    cause: "Using self.options to access parsed CLI arguments. The correct attribute is self.options_menu."
+    fix: |
+      1. Replace self.options with self.options_menu throughout your code.
+      2. self.options_menu contains the argparse namespace with all parsed CLI arguments.
+      3. Example: self.options_menu.labels_json, not self.options.labels_json
+    phase: "Phase 4.5 (Peer Review)"
+    app_types: [pipeline]
+
+  - error: "Duplicate argparse arguments"
+    symptom: "argparse error: 'conflicting option string' or argument defined twice"
+    cause: "The same CLI argument is added in both the main .py file and the pipeline .py file. Arguments should only be defined once."
+    fix: |
+      1. Define app-specific CLI args in the pipeline class __init__ (before super().__init__).
+      2. Do not re-add the same args in the callback/main file.
+      3. Pass the parser from main() to the pipeline class to share a single parser instance.
+    phase: "Phase 4.5 (Peer Review)"
+    app_types: [pipeline]

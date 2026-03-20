@@ -6,26 +6,28 @@ Community-contributed AI applications for Hailo edge accelerators, built on top 
 
 ```
 hailo-community-projects/          ← THIS REPO (community hub)
-├── hailo-apps-infra/              ← Git submodule (core framework)
-│   ├── hailo_apps/                # Core Python/C++ framework (READ-ONLY reference)
-│   │   ├── python/core/           # GStreamerApp, helpers, buffer_utils
-│   │   ├── python/pipeline_apps/  # Official pipeline apps
-│   │   ├── python/standalone_apps/# Official standalone apps
-│   │   ├── python/gen_ai_apps/    # Official GenAI apps
-│   │   ├── postprocess/cpp/       # C++ GStreamer plugins
-│   │   └── config/                # YAML configs
-│   ├── install.sh                 # Main installer
-│   └── setup_env.sh               # Infra env setup
+├── hailo-apps-infra/              ← Git submodule (core framework, READ-ONLY)
+│   ├── hailo_apps/                # Core Python/C++ framework
+│   └── ...
 ├── community/                     ← COMMUNITY APPS (write here)
 │   ├── apps/
 │   │   ├── pipeline_apps/         # 14 community pipeline apps
 │   │   ├── standalone_apps/       # 5 community standalone apps
 │   │   └── gen_ai_apps/           # 2 community GenAI apps
 │   └── contributions/             # Optimization insights
-├── community_projects/            # Legacy community projects
-├── install.sh                     # Thin wrapper → hailo-apps-infra/install.sh
-├── setup_env.sh                   # Environment setup (activates venv, sets PYTHONPATH)
-└── config.yaml                    # Submodule branch/tag config
+├── .hailo/                        ← SHARED KNOWLEDGE (all platforms)
+│   ├── README.md                  # Master index
+│   ├── instructions/              # Architecture & standards
+│   ├── skills/                    # Platform-neutral skill docs (hl- prefix)
+│   ├── toolsets/                  # API references
+│   ├── knowledge/                 # YAML knowledge bases
+│   ├── memory/                    # Persistent cross-session knowledge
+│   ├── templates/                 # Scaffold templates
+│   └── examples/                  # Runnable code examples
+├── .claude/skills/                ← Claude Code slash commands (thin wrappers → .hailo/)
+├── .github/prompts/               ← Copilot prompt files (hl- prefixed)
+├── .cursor/rules                  ← Cursor entry point (→ .hailo/)
+└── community_projects/            # Legacy community projects
 ```
 
 **Rule:** READ from `hailo-apps-infra/hailo_apps/...` for framework code. WRITE new apps to `community/apps/`.
@@ -38,6 +40,11 @@ source setup_env.sh                    # Activate environment (always do this fi
 git submodule update --init --recursive # Initialize submodule only
 ```
 
+## Shared Knowledge
+
+All skills, instructions, toolsets, knowledge bases, templates, and examples live in `.hailo/`.
+Read `.hailo/README.md` for the complete master index.
+
 ## Python Imports
 
 ```python
@@ -49,46 +56,40 @@ from hailo_apps.python.core.gstreamer.gstreamer_helper_pipelines import SOURCE_P
 from community.apps.pipeline_apps.baby_sleep_monitor import baby_sleep_monitor
 ```
 
+## Skills (hl- prefix)
+
+### Claude Code Slash Commands
+| Command | Description |
+|---------|-------------|
+| `/hl-build-app` | Build new Hailo AI apps (main builder) |
+| `/hl-build-vlm-app` | Build VLM image understanding apps |
+| `/hl-build-standalone-app` | Build standalone HailoRT apps |
+| `/hl-build-agent-app` | Build AI agent apps with tool calling |
+| `/hl-add-voice` | Add speech-to-text / text-to-speech |
+| `/hl-profile` | Profile GStreamer pipeline performance |
+| `/hl-contribute` | Share optimization insights with community |
+
+### Reference Skills (docs in `.hailo/skills/`, consulted by agents)
+| Skill | Description |
+|-------|-------------|
+| `hl-monitoring` | Continuous video monitoring pattern |
+| `hl-event-detection` | Event detection from VLM responses |
+| `hl-camera` | Camera setup & management |
+| `hl-model-management` | HEF model management |
+| `hl-plan-and-execute` | Orchestrated workflow pattern |
+| `hl-validate` | Validation & testing |
+
 ## Community App Types
 
 ### Pipeline Apps (`community/apps/pipeline_apps/`)
 Real-time GStreamer video pipelines. Same pattern as infra apps:
 - `app.py` (callback + main) + `app_pipeline.py` (GStreamerApp subclass)
-- Apps: baby_sleep_monitor, cat_food_monitor, depth_proximity_alert, gesture_mouse, license_plate_reader, line_crossing_counter, multi_camera_store_monitor, multi_entrance_tracker, parking_lot_occupancy, ppe_safety_checker, retail_shelf_analyzer, room_security_monitor, semaphore_translator, workout_rep_counter
 
 ### Standalone Apps (`community/apps/standalone_apps/`)
 Lightweight HailoRT-only apps, no GStreamer needed.
-- Apps: aerial_object_counter, document_text_extractor, lane_departure_warning, photo_enhancer, traffic_light_detector
 
 ### GenAI Apps (`community/apps/gen_ai_apps/`)
 Hailo-10H generative AI apps.
-- Apps: visual_quality_inspector, voice_controlled_camera
-
-## Claude Code Skills
-
-### `/app-builder` — Build new Hailo AI apps
-Discover requirements, recommend templates, scaffold, implement, test, profile, and share.
-- Knowledge: `.claude/skills/app-builder/knowledge/`
-- Templates: `.claude/skills/app-builder/knowledge/templates/`
-
-### `/profile-pipeline` — Profile GStreamer pipeline performance
-Auto-setup GST-Shark, profile, analyze bottlenecks, suggest optimizations, run experiments.
-- Scripts: `.claude/skills/profile-pipeline/scripts/`
-- Knowledge base: `.claude/skills/profile-pipeline/knowledge/knowledge_base.yaml`
-
-### `/contribute-insights` — Share optimization insights
-Format findings, sanitize data, submit as PR to hailo-community-projects.
-
-## Memory
-
-Persistent knowledge base in `.claude/memory/`. Consult at task start, update when learning.
-
-## Testing
-
-```bash
-cd tests/
-pytest -v                              # Run all tests
-```
 
 ## Hardware
 
@@ -97,3 +98,14 @@ pytest -v                              # Run all tests
 | Hailo-8 | `hailo8` | Full performance, all pipeline + standalone apps |
 | Hailo-8L | `hailo8l` | Lower power, compatible model subset |
 | Hailo-10H | `hailo10h` | GenAI (LLM, VLM, Whisper) + vision pipelines |
+
+## Memory
+
+Persistent knowledge base in `.hailo/memory/`. Consult at task start, update when learning.
+
+## Testing
+
+```bash
+cd tests/
+pytest -v                              # Run all tests
+```

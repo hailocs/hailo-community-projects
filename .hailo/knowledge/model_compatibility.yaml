@@ -1,0 +1,387 @@
+# ============================================================================
+# MODEL COMPATIBILITY - HEF model matrix for Hailo app development
+# ============================================================================
+# Extracted from app_catalog.yaml and resources_config.yaml references.
+# Use this to verify model availability before recommending an app template.
+# Referenced in Phase 2 (Recommendation) and Phase 2.5 (Feasibility).
+
+models:
+
+  # --------------------------------------------------------------------------
+  # Detection Models
+  # --------------------------------------------------------------------------
+
+  - name: "yolov8m"
+    task: "detection"
+    hef:
+      hailo8: "yolov8m.hef"
+      hailo8l: null
+      hailo10h: "yolov8m.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: "coco.txt"
+    postprocess_so: "libyolo_hailortpp_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [detection, multisource, object_detection_standalone]
+    notes: "Default detection model for hailo8/hailo10h. Medium size, good accuracy-speed tradeoff."
+
+  - name: "yolov8s"
+    task: "detection"
+    hef:
+      hailo8: "yolov8s.hef"
+      hailo8l: "yolov8s.hef"
+      hailo10h: "yolov8s.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: "coco.txt"
+    postprocess_so: "libyolo_hailortpp_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [detection, multisource, object_detection_standalone]
+    notes: "Default detection model for hailo8l. Smaller, faster, slightly less accurate than yolov8m."
+
+  - name: "yolov6n"
+    task: "detection"
+    hef:
+      hailo8: "yolov6n.hef"
+      hailo8l: "yolov6n.hef"
+      hailo10h: "yolov6n.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: "coco.txt"
+    postprocess_so: "libyolo_hailortpp_postprocess.so"
+    postprocess_func: "filter"
+    used_by: [detection_simple]
+    notes: "Default for detection_simple. Nano model, lowest latency. Uses 'filter' (not 'filter_letterbox')."
+
+  - name: "hailo_yolov8n_4_classes_vga"
+    task: "detection"
+    hef:
+      hailo8: "hailo_yolov8n_4_classes_vga.hef"
+      hailo8l: "hailo_yolov8n_4_classes_vga.hef"
+      hailo10h: "hailo_yolov8n_4_classes_vga.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: "4_classes.txt"
+    postprocess_so: "libyolo_hailortpp_postprocess.so"
+    postprocess_func: "filter"
+    used_by: [tiling, clip]
+    notes: "4-class detector (person, vehicle, face, license-plate). Used by tiling and CLIP as a lightweight front-end detector."
+
+  # --------------------------------------------------------------------------
+  # Pose Estimation Models
+  # --------------------------------------------------------------------------
+
+  - name: "yolov8m_pose"
+    task: "pose_estimation"
+    hef:
+      hailo8: "yolov8m_pose.hef"
+      hailo8l: null
+      hailo10h: "yolov8m_pose.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION + HAILO_LANDMARKS"
+    labels: "coco_pose.txt"
+    postprocess_so: "libyolov8pose_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [pose_estimation, pose_estimation_standalone]
+    notes: "17 COCO keypoints. Default pose model for hailo8/hailo10h."
+
+  - name: "yolov8s_pose"
+    task: "pose_estimation"
+    hef:
+      hailo8: "yolov8s_pose.hef"
+      hailo8l: "yolov8s_pose.hef"
+      hailo10h: "yolov8s_pose.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION + HAILO_LANDMARKS"
+    labels: "coco_pose.txt"
+    postprocess_so: "libyolov8pose_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [pose_estimation, pose_estimation_standalone]
+    notes: "17 COCO keypoints. Default pose model for hailo8l."
+
+  # --------------------------------------------------------------------------
+  # Segmentation Models
+  # --------------------------------------------------------------------------
+
+  - name: "yolov5m_seg"
+    task: "instance_segmentation"
+    hef:
+      hailo8: "yolov5m_seg.hef"
+      hailo8l: null
+      hailo10h: "yolov5m_seg.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION + HAILO_CONF_CLASS_MASK"
+    labels: "coco.txt"
+    postprocess_so: "libyolov5seg_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [instance_segmentation, instance_segmentation_standalone]
+    notes: "Default segmentation model for hailo8/hailo10h. Per-object pixel masks."
+
+  - name: "yolov5n_seg"
+    task: "instance_segmentation"
+    hef:
+      hailo8: "yolov5n_seg.hef"
+      hailo8l: "yolov5n_seg.hef"
+      hailo10h: "yolov5n_seg.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION + HAILO_CONF_CLASS_MASK"
+    labels: "coco.txt"
+    postprocess_so: "libyolov5seg_postprocess.so"
+    postprocess_func: "filter_letterbox"
+    used_by: [instance_segmentation, instance_segmentation_standalone]
+    notes: "Default segmentation model for hailo8l. Nano variant."
+
+  # --------------------------------------------------------------------------
+  # Face Detection / Recognition Models
+  # --------------------------------------------------------------------------
+
+  - name: "scrfd_10g"
+    task: "face_detection"
+    hef:
+      hailo8: "scrfd_10g.hef"
+      hailo8l: null
+      hailo10h: "scrfd_10g.hef"
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: null
+    postprocess_so: "libscrfd.so"
+    postprocess_func: "scrfd_10g_letterbox"
+    used_by: [face_recognition, reid_multisource]
+    notes: "Face detector for hailo8/hailo10h. Used as first stage in cascaded face recognition."
+
+  - name: "scrfd_2.5g"
+    task: "face_detection"
+    hef:
+      hailo8: null
+      hailo8l: "scrfd_2.5g.hef"
+      hailo10h: null
+    input_shape: [640, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: null
+    postprocess_so: "libscrfd.so"
+    postprocess_func: "scrfd_2_5g_letterbox"
+    used_by: [face_recognition, reid_multisource]
+    notes: "Face detector for hailo8l. Lighter variant of scrfd_10g."
+
+  - name: "arcface_mobilefacenet"
+    task: "face_recognition"
+    hef:
+      hailo8: "arcface_mobilefacenet.hef"
+      hailo8l: "arcface_mobilefacenet.hef"
+      hailo10h: "arcface_mobilefacenet.hef"
+    input_shape: [112, 112, 3]
+    output_type: "HAILO_MATRIX"
+    labels: null
+    postprocess_so: "libface_recognition_post.so"
+    postprocess_func: "filter"
+    used_by: [face_recognition, reid_multisource]
+    notes: "Face embedding model. Produces 512-d vectors for identity matching via vector database."
+
+  # --------------------------------------------------------------------------
+  # Depth Models
+  # --------------------------------------------------------------------------
+
+  - name: "scdepthv3"
+    task: "depth_estimation"
+    hef:
+      hailo8: "scdepthv3.hef"
+      hailo8l: "scdepthv3.hef"
+      hailo10h: "scdepthv3.hef"
+    input_shape: [256, 320, 3]
+    output_type: "HAILO_DEPTH_MASK"
+    labels: null
+    postprocess_so: "libdepth_postprocess.so"
+    postprocess_func: "filter_scdepth"
+    used_by: [depth]
+    notes: "Monocular depth estimation. Per-pixel depth maps. All architectures supported."
+
+  # --------------------------------------------------------------------------
+  # CLIP Models
+  # --------------------------------------------------------------------------
+
+  - name: "clip_vit_b_32_image_encoder"
+    task: "clip_image_encoding"
+    hef:
+      hailo8: "clip_vit_b_32_image_encoder.hef"
+      hailo8l: "clip_vit_b_32_image_encoder.hef"
+      hailo10h: "clip_vit_b_32_image_encoder.hef"
+    input_shape: [224, 224, 3]
+    output_type: "HAILO_MATRIX"
+    labels: null
+    postprocess_so: "libclip_postprocess.so"
+    postprocess_func: "filter"
+    used_by: [clip]
+    notes: "CLIP image encoder. Produces embeddings for zero-shot classification."
+
+  - name: "clip_vit_b_32_text_encoder"
+    task: "clip_text_encoding"
+    hef:
+      hailo8: "clip_vit_b_32_text_encoder.hef"
+      hailo8l: "clip_vit_b_32_text_encoder.hef"
+      hailo10h: "clip_vit_b_32_text_encoder.hef"
+    input_shape: null
+    output_type: "HAILO_MATRIX"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [clip]
+    notes: "CLIP text encoder. Runs text prompts for zero-shot matching. No postprocess needed."
+
+  # --------------------------------------------------------------------------
+  # OCR Models
+  # --------------------------------------------------------------------------
+
+  - name: "ocr_det"
+    task: "ocr_detection"
+    hef:
+      hailo8: "ocr_det.hef"
+      hailo8l: "ocr_det.hef"
+      hailo10h: "ocr_det.hef"
+    input_shape: [480, 640, 3]
+    output_type: "HAILO_DETECTION"
+    labels: null
+    postprocess_so: "libocr_postprocess.so"
+    postprocess_func: "paddleocr_det"
+    used_by: [paddle_ocr, paddle_ocr_standalone]
+    notes: "PaddleOCR text region detector. First stage of OCR pipeline."
+
+  - name: "ocr"
+    task: "ocr_recognition"
+    hef:
+      hailo8: "ocr.hef"
+      hailo8l: "ocr.hef"
+      hailo10h: "ocr.hef"
+    input_shape: [32, 320, 3]
+    output_type: "HAILO_CLASSIFICATION"
+    labels: null
+    postprocess_so: "libocr_postprocess.so"
+    postprocess_func: "paddleocr_recognize"
+    used_by: [paddle_ocr, paddle_ocr_standalone]
+    notes: "PaddleOCR text recognition. Second stage of OCR pipeline. Runs on cropped text regions."
+
+  # --------------------------------------------------------------------------
+  # Standalone-Only Models
+  # --------------------------------------------------------------------------
+
+  - name: "ufld_v2_tu"
+    task: "lane_detection"
+    hef:
+      hailo8: "ufld_v2_tu.hef"
+      hailo8l: null
+      hailo10h: "ufld_v2_tu.hef"
+    input_shape: [320, 800, 3]
+    output_type: "custom (lane points)"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [lane_detection_standalone]
+    notes: "UFLD v2 lane detection. NOT available on hailo8l. CPU postprocess in Python."
+
+  - name: "real_esrgan_x2"
+    task: "super_resolution"
+    hef:
+      hailo8: "real_esrgan_x2.hef"
+      hailo8l: "real_esrgan_x2.hef"
+      hailo10h: "real_esrgan_x2.hef"
+    input_shape: [256, 256, 3]
+    output_type: "upscaled image"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [super_resolution_standalone]
+    notes: "2x upscaling. All architectures supported. CPU postprocess in Python."
+
+  - name: "yolo11s_obb"
+    task: "oriented_object_detection"
+    hef:
+      hailo8: "yolo11s_obb.hef"
+      hailo8l: "yolo11s_obb.hef"
+      hailo10h: "yolo11s_obb.hef"
+    input_shape: [640, 640, 3]
+    output_type: "oriented bboxes"
+    labels: "dota.txt"
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [oriented_object_detection_standalone]
+    notes: "Oriented bounding box detection. All architectures. CPU postprocess in Python."
+
+  # --------------------------------------------------------------------------
+  # GenAI Models (Hailo-10H Only)
+  # --------------------------------------------------------------------------
+
+  - name: "Qwen2.5-1.5B-Instruct"
+    task: "llm"
+    hef:
+      hailo8: null
+      hailo8l: null
+      hailo10h: "Qwen2.5-1.5B-Instruct.hef"
+    input_shape: null
+    output_type: "text tokens"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [simple_llm_chat, voice_assistant]
+    notes: "Default LLM. Hailo-10H only. 32K context window. Good for general chat and tool calling."
+
+  - name: "Qwen2.5-Coder-1.5B-Instruct"
+    task: "llm"
+    hef:
+      hailo8: null
+      hailo8l: null
+      hailo10h: "Qwen2.5-Coder-1.5B-Instruct.hef"
+    input_shape: null
+    output_type: "text tokens"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [agent_tools_example]
+    notes: "Code-specialized LLM. Hailo-10H only. Better at structured output and function calling."
+
+  - name: "Qwen2-VL-2B-Instruct"
+    task: "vlm"
+    hef:
+      hailo8: null
+      hailo8l: null
+      hailo10h: "Qwen2-VL-2B-Instruct.hef"
+    input_shape: [336, 336, 3]
+    output_type: "text tokens"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [vlm_chat, simple_vlm_chat]
+    notes: "Vision-Language Model. Hailo-10H only. Accepts 336x336 RGB images. Image must be passed via frames= parameter."
+
+  - name: "Whisper-Base"
+    task: "speech_to_text"
+    hef:
+      hailo8: null
+      hailo8l: null
+      hailo10h: "Whisper-Base.hef"
+    input_shape: null
+    output_type: "text tokens"
+    labels: null
+    postprocess_so: null
+    postprocess_func: null
+    used_by: [simple_whisper_chat, voice_assistant]
+    notes: "Speech-to-text. Hailo-10H only. Used via SpeechToTextProcessor wrapper."
+
+# ============================================================================
+# Architecture Compatibility Summary
+# ============================================================================
+# Quick reference for which architectures support which model categories:
+#
+# | Category          | hailo8 | hailo8l | hailo10h |
+# |-------------------|--------|---------|----------|
+# | Detection (YOLO)  |   Y    |    Y    |    Y     |
+# | Pose (YOLOv8)     |   Y    |    Y    |    Y     |
+# | Segmentation      |   Y    |    Y    |    Y     |
+# | Face (SCRFD+Arc)  |   Y    |    Y    |    Y     |
+# | Depth (SCDepth)   |   Y    |    Y    |    Y     |
+# | CLIP              |   Y    |    Y    |    Y     |
+# | OCR (Paddle)      |   Y    |    Y    |    Y     |
+# | Lane (UFLD)       |   Y    |    N    |    Y     |
+# | Super Res (ESRGAN)|   Y    |    Y    |    Y     |
+# | OBB (YOLO11s)     |   Y    |    Y    |    Y     |
+# | LLM (Qwen)        |   N    |    N    |    Y     |
+# | VLM (Qwen2-VL)    |   N    |    N    |    Y     |
+# | STT (Whisper)     |   N    |    N    |    Y     |

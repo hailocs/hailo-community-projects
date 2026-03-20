@@ -1,0 +1,40 @@
+# Hailo Community Projects — Cursor Rules
+
+This repository builds AI applications for Hailo edge accelerators.
+
+## Quick Start
+- Read `.hailo/README.md` for the master index of all shared knowledge
+- Read `CLAUDE.md` for project identity and conventions
+
+## Shared Knowledge (platform-neutral)
+All skills, instructions, toolsets, knowledge bases, templates, and examples live in `.hailo/`.
+See `.hailo/README.md` for the complete directory listing.
+
+## Two-Repo Layout
+- `hailo-apps-infra/` — Git submodule with the core framework (READ-ONLY)
+- `community/apps/` — Where new apps go (WRITE here)
+- Python imports use `from hailo_apps.python.core...` (via PYTHONPATH)
+
+## Available Skills (hl- prefix)
+| Skill | Doc | Description |
+|-------|-----|-------------|
+| hl-build-app | `.hailo/skills/hl-build-app.md` | Build new Hailo AI apps |
+| hl-build-vlm-app | `.hailo/skills/hl-build-vlm-app.md` | VLM-specific apps |
+| hl-build-standalone-app | `.hailo/skills/hl-build-standalone-app.md` | Standalone HailoRT apps |
+| hl-build-agent-app | `.hailo/skills/hl-build-agent-app.md` | Agent apps with tool calling |
+| hl-add-voice | `.hailo/skills/hl-add-voice.md` | Add voice to any app |
+| hl-profile | `.hailo/skills/hl-profile.md` | Profile pipeline performance |
+| hl-contribute | `.hailo/skills/hl-contribute.md` | Share community insights |
+| hl-monitoring | `.hailo/skills/hl-monitoring.md` | Continuous monitoring pattern |
+| hl-event-detection | `.hailo/skills/hl-event-detection.md` | Event detection from VLM |
+| hl-camera | `.hailo/skills/hl-camera.md` | Camera setup & management |
+| hl-model-management | `.hailo/skills/hl-model-management.md` | HEF model management |
+| hl-plan-and-execute | `.hailo/skills/hl-plan-and-execute.md` | Orchestrated workflow |
+| hl-validate | `.hailo/skills/hl-validate.md` | Validation & testing |
+
+## Hardware
+| Architecture | Value | Use case |
+|---|---|---|
+| Hailo-8 | `hailo8` | Full performance pipeline + standalone apps |
+| Hailo-8L | `hailo8l` | Lower power, compatible model subset |
+| Hailo-10H | `hailo10h` | GenAI (LLM, VLM, Whisper) + vision pipelines |

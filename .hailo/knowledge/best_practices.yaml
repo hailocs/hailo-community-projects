@@ -1,0 +1,254 @@
+# ============================================================================
+# BEST PRACTICES - Lessons learned from building Hailo apps
+# ============================================================================
+# Extracted from tested community apps, code_snippets.yaml patterns,
+# and template development experience.
+# Referenced by SKILL.md across multiple phases.
+
+practices:
+
+  # --------------------------------------------------------------------------
+  # Callback Performance
+  # --------------------------------------------------------------------------
+
+  - title: "Keep callbacks non-blocking"
+    situation: "Any pipeline app callback function"
+    insight: |
+      The callback runs in the GStreamer streaming thread. Any blocking operation
+      (file I/O, network calls, database queries, heavy CV operations) stalls the
+      entire pipeline. Move heavy work to a background thread via queue.Queue.
+      The callback should only extract metadata, update lightweight state, and
+      optionally draw on the frame.
+    applies_to: [pipeline]
+    source: "pipeline_app.md template, workout_rep_counter, room_security_monitor"
+
+  - title: "Throttle console output"
+    situation: "Any app that prints detection results to terminal"
+    insight: |
+      Printing every frame floods the terminal and measurably slows the pipeline.
+      Use frame_count % 30 == 0 (or similar) to print summary statistics at
+      regular intervals instead. For real-time status, prefer on-screen overlays
+      (hailooverlay or cv2.putText with --use-frame).
+    applies_to: [pipeline, standalone]
+    source: "Phase 4.5 peer review findings across 20 apps"
+
+  - title: "Avoid heavy OpenCV operations in callbacks"
+    situation: "Pipeline app using --use-frame for custom drawing"
+    insight: |
+      Operations like cv2.resize, cv2.warpPerspective, or complex contour
+      analysis in the callback add CPU overhead that directly reduces FPS.
+      Use hailooverlay_community for bbox/label rendering (C++ speed) and
+      limit Python drawing to simple overlays (putText, line, rectangle).
+      For the best performance, use the hybrid display pattern: overlay
+      renders bboxes, callback adds only custom extras.
+    applies_to: [pipeline]
+    source: "code_snippets.yaml:hybrid_overlay_plus_userframe"
+
+  # --------------------------------------------------------------------------
+  # Display Method Selection
+  # --------------------------------------------------------------------------
+
+  - title: "Choose display method early"
+    situation: "Phase 1 discovery, before scaffolding"
+    insight: |
+      Display method affects pipeline architecture, not just appearance.
+      hailooverlay requires no callback code. user-frame adds ~5-10% CPU.
+      Hybrid (overlay + user-frame) needs specific element ordering. fakesink
+      is needed for pygame/web display. Deciding late means restructuring
+      the pipeline. Ask about display preferences in discovery (Phase 1 Q8).
+    applies_to: [pipeline]
+    source: "decision_tree.yaml display_decision section"
+
+  - title: "Use GStreamer/OpenCV for video, web for controls"
+    situation: "App needs both visual display and a web-accessible control panel"
+    insight: |
+      Web-hosted video streaming (MJPEG over HTTP, WebRTC) always adds latency
+      compared to local GStreamer/OpenCV windows. For apps needing remote access,
+      display video via GStreamer/OpenCV and run a Flask/FastAPI server in a
+      background thread for control panels (sliders, buttons, settings, alerts
+      dashboard). See code_snippets.yaml:web_control_panel.
+    applies_to: [pipeline, standalone]
+    source: "code_snippets.yaml:web_control_panel, Phase 1 Q8 guidance"
+
+  # --------------------------------------------------------------------------
+  # Multi-Model Pipeline Design
+  # --------------------------------------------------------------------------
+
+  - title: "Use inference wrapper for resolution preservation"
+    situation: "Pipeline app where display resolution should be higher than model input"
+    insight: |
+      Without INFERENCE_PIPELINE_WRAPPER, the frame is resized to model input
+      (e.g., 640x640) and stays that way for display. The wrapper routes the
+      original full-res frame through a bypass while a scaled copy goes through
+      inference, then aggregates results back. Use it unless you specifically
+      want low-res output (e.g., detection_simple).
+    applies_to: [pipeline]
+    source: "pipeline_patterns.yaml:source_infer_wrapper_track_display"
+
+  - title: "Cascaded models need CROPPER_PIPELINE"
+    situation: "App needs two models in sequence (detect then classify/recognize)"
+    insight: |
+      For detect-then-classify patterns (face detection + recognition, text
+      detection + OCR), use CROPPER_PIPELINE to crop detections from the first
+      model and feed them to the second. The cropper handles scaling, padding,
+      and result aggregation automatically. Always place the tracker between
+      the first inference and the cropper so crops get consistent IDs.
+    applies_to: [pipeline]
+    source: "face_recognition, paddle_ocr apps"
+
+  # --------------------------------------------------------------------------
+  # Resource Cleanup
+  # --------------------------------------------------------------------------
+
+  - title: "Always release GenAI resources in finally blocks"
+    situation: "Any GenAI app using LLM, VLM, or VDevice"
+    insight: |
+      GenAI resources (LLM, VLM, VDevice) lock hardware resources. If not
+      released properly (crash, unhandled exception), the device may be locked
+      for other processes. Always use try/finally:
+        try: llm = LLM(...); # use it
+        finally: llm.release(); vdevice.release()
+      Call clear_context() before release() to free the KV cache.
+    applies_to: [genai]
+    source: "genai_app.md template"
+
+  - title: "Clean up stale tracking state"
+    situation: "Pipeline app maintaining per-track-ID state dicts"
+    insight: |
+      Track IDs accumulate indefinitely if not cleaned up. Objects leave the
+      frame but their state stays in memory. Implement periodic cleanup:
+      compare active track IDs from the current frame against stored state,
+      and remove entries not seen for max_age frames. See
+      code_snippets.yaml:per_track_state for the cleanup_stale() pattern.
+    applies_to: [pipeline]
+    source: "code_snippets.yaml:per_track_state"
+
+  # --------------------------------------------------------------------------
+  # Error Handling
+  # --------------------------------------------------------------------------
+
+  - title: "Handle missing detections gracefully"
+    situation: "Callback logic assumes detections will always be present"
+    insight: |
+      Some frames will have zero detections (object left frame, occlusion,
+      model uncertainty). Always check len(detections) before processing.
+      For counting apps, handle the zero-detection case to avoid resetting
+      counts or triggering false alerts.
+    applies_to: [pipeline, standalone]
+    source: "parking_lot_occupancy, line_crossing_counter"
+
+  - title: "Validate HEF and postprocess paths at init"
+    situation: "Pipeline app constructor"
+    insight: |
+      Check that hef_path and post_process_so exist (Path.exists()) during
+      __init__ and log clear errors before create_pipeline() is called.
+      A missing HEF gives a cryptic HailoRT error; a missing .so gives a
+      GStreamer 'failed to load' error. Early validation with clear messages
+      saves debugging time.
+    applies_to: [pipeline]
+    source: "pipeline_app.md template"
+
+  # --------------------------------------------------------------------------
+  # Testing Strategies
+  # --------------------------------------------------------------------------
+
+  - title: "Test with video files before cameras"
+    situation: "Phase 5 testing of any app"
+    insight: |
+      Always test with a video file first (deterministic, reproducible) before
+      switching to live camera input. Video files let you verify detection
+      accuracy against known ground truth. Use the default test videos from
+      resources_config.yaml if no user samples are available. Camera input
+      adds variability (lighting, angle, resolution) that makes debugging harder.
+    applies_to: [pipeline, standalone]
+    source: "Phase 5 testing workflow"
+
+  - title: "Use py_compile before running"
+    situation: "After scaffolding or editing app files"
+    insight: |
+      Run python3 -m py_compile on all .py files before attempting to run
+      the app. This catches syntax errors, missing imports, and indentation
+      issues instantly. Follow up with --help to verify argparse configuration
+      and module-level imports resolve correctly.
+    applies_to: [pipeline, standalone, genai]
+    source: "Phase 5 automated validation"
+
+  # --------------------------------------------------------------------------
+  # Model Selection
+  # --------------------------------------------------------------------------
+
+  - title: "Match model size to hardware"
+    situation: "Phase 2 model recommendation"
+    insight: |
+      Hailo-8L has less compute than Hailo-8. Use smaller model variants:
+      yolov8s instead of yolov8m, yolov5n_seg instead of yolov5m_seg,
+      scrfd_2.5g instead of scrfd_10g. Check model_compatibility.yaml for
+      which models have hailo8l HEFs. Using a model without an hailo8l HEF
+      will fail at runtime.
+    applies_to: [pipeline, standalone]
+    source: "model_compatibility.yaml, app_catalog.yaml"
+
+  - title: "COCO labels cover most common use cases"
+    situation: "User wants to detect common objects (people, vehicles, animals)"
+    insight: |
+      COCO-trained models (yolov8s/m) detect 80 classes including person, car,
+      truck, bus, bicycle, cat, dog, etc. Before recommending custom training,
+      check if the user's target objects are in the COCO label set. For objects
+      not in COCO, consider CLIP for zero-shot classification or point the user
+      to Hailo Model Zoo for retraining guides.
+    applies_to: [pipeline, standalone]
+    source: "Phase 2.5 feasibility testing"
+
+  # --------------------------------------------------------------------------
+  # State Management
+  # --------------------------------------------------------------------------
+
+  - title: "Use app_callback_class for frame state"
+    situation: "Callback needs to persist data across frames"
+    insight: |
+      Subclass app_callback_class to store state that persists across callback
+      invocations. Do NOT use global variables -- they cause issues with
+      multiprocessing and testing. The base class provides get_count() for
+      frame counting (auto-incremented, do not call increment() yourself),
+      use_frame for checking frame extraction mode, and set_frame() for
+      sending modified frames to the display process.
+    applies_to: [pipeline]
+    source: "pipeline_app.md template, code_snippets.yaml:per_track_state"
+
+  - title: "Debounce noisy per-frame classifications"
+    situation: "Gesture recognition, signal decoding, or any noisy classifier"
+    insight: |
+      Per-frame classifications are noisy -- a gesture detected one frame may
+      not be detected the next. Use temporal smoothing: require the same
+      classification for N consecutive frames before accepting it. See
+      code_snippets.yaml:signal_stabilization for the StabilizedClassifier
+      pattern. Typical threshold: 5-15 frames depending on FPS and use case.
+    applies_to: [pipeline]
+    source: "code_snippets.yaml:signal_stabilization, semaphore_translator"
+
+  # --------------------------------------------------------------------------
+  # Pipeline Optimization
+  # --------------------------------------------------------------------------
+
+  - title: "Use batch_size=2 for better throughput"
+    situation: "Detection, pose, and segmentation pipeline apps"
+    insight: |
+      Setting batch_size=2 in INFERENCE_PIPELINE allows the accelerator to
+      process two frames simultaneously, improving throughput by 20-40% on
+      most models. This is the default for detection, pose_estimation, and
+      instance_segmentation. Higher batch sizes may help with tiling but
+      add latency. For real-time single-camera apps, batch_size=2 is the
+      sweet spot.
+    applies_to: [pipeline]
+    source: "detection_pipeline.py, pose_estimation_pipeline.py"
+
+  - title: "Use QUEUE elements between pipeline stages"
+    situation: "Complex pipelines with multiple processing stages"
+    insight: |
+      GStreamer QUEUE elements decouple pipeline stages into separate threads,
+      preventing one slow stage from blocking others. The helper functions
+      (INFERENCE_PIPELINE, DISPLAY_PIPELINE) include queues internally, but
+      for custom pipeline segments, add QUEUE() between stages. Set
+      max_size_buffers to control memory usage (default is usually fine).
+    applies_to: [pipeline]
+    source: "pipeline_patterns.yaml, gstreamer_helper_pipelines.py"
