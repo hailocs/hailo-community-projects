@@ -1,0 +1,3 @@
+[submodule "hailo-apps-infra"]
+	path = hailo-apps-infra
+	url = https://github.com/hailo-ai/hailo-apps-infra.git

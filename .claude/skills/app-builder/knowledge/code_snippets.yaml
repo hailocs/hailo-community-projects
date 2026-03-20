@@ -1,0 +1,910 @@
+# ============================================================================
+# CODE SNIPPETS - Reusable callback patterns for app-builder scaffolding
+# ============================================================================
+# These snippets are extracted from tested example apps (test/app-builder-20-apps).
+# The app-builder should offer these when the use case matches.
+# TODO: Consider refactoring into shared utilities in core/common/ later.
+
+# ============================================================================
+# POSE KEYPOINT UTILITIES
+# ============================================================================
+# Used by: workout_rep_counter, semaphore_translator, baby_sleep_monitor,
+#          gesture_detection, and any pose-based app.
+
+pose_keypoints:
+  description: "COCO keypoint index map and pixel coordinate extraction"
+  used_by: [workout_rep_counter, semaphore_translator, baby_sleep_monitor]
+  when_to_use: "Any app that uses YOLOv8-pose and needs to work with specific body joints"
+  code: |
+    # COCO keypoint indices (17 keypoints)
+    KEYPOINTS = {
+        "nose": 0,
+        "left_eye": 1,     "right_eye": 2,
+        "left_ear": 3,     "right_ear": 4,
+        "left_shoulder": 5, "right_shoulder": 6,
+        "left_elbow": 7,   "right_elbow": 8,
+        "left_wrist": 9,   "right_wrist": 10,
+        "left_hip": 11,    "right_hip": 12,
+        "left_knee": 13,   "right_knee": 14,
+        "left_ankle": 15,  "right_ankle": 16,
+    }
+
+    def get_keypoint_pixel_coords(points, keypoint_name, bbox, width, height):
+        """
+        Extract pixel coordinates for a named keypoint.
+
+        Args:
+            points: list of landmark points from hailo (landmarks[0].get_points())
+            keypoint_name: string key from KEYPOINTS dict
+            bbox: HailoBBox from detection.get_bbox()
+            width: frame width in pixels
+            height: frame height in pixels
+
+        Returns:
+            (x, y) tuple in pixel coordinates, or None if not available.
+        """
+        idx = KEYPOINTS.get(keypoint_name)
+        if idx is None or idx >= len(points):
+            return None
+        point = points[idx]
+        x = (point.x() * bbox.width() + bbox.xmin()) * width
+        y = (point.y() * bbox.height() + bbox.ymin()) * height
+        return (x, y)
+
+joint_angle_calculation:
+  description: "Calculate angle at a joint from three keypoints (used for rep counting, posture analysis)"
+  used_by: [workout_rep_counter, baby_sleep_monitor]
+  when_to_use: "Any app that needs joint angles — exercise tracking, posture monitoring, ergonomics"
+  code: |
+    import math
+
+    def calculate_angle(p1, p2, p3):
+        """
+        Calculate the angle at p2 formed by line segments p1-p2 and p2-p3.
+
+        Args:
+            p1: (x, y) first point
+            p2: (x, y) vertex point (the joint)
+            p3: (x, y) third point
+
+        Returns:
+            Angle in degrees (0-180).
+        """
+        v1 = (p1[0] - p2[0], p1[1] - p2[1])
+        v2 = (p3[0] - p2[0], p3[1] - p2[1])
+
+        dot = v1[0] * v2[0] + v1[1] * v2[1]
+        mag1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2)
+        mag2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2)
+
+        if mag1 == 0 or mag2 == 0:
+            return 0.0
+
+        cos_angle = max(-1.0, min(1.0, dot / (mag1 * mag2)))
+        return math.degrees(math.acos(cos_angle))
+
+arm_angle_and_discretization:
+  description: "Compute directional arm angle (0-360) and discretize to 45-degree steps"
+  used_by: [semaphore_translator]
+  when_to_use: "Gesture recognition, sign language, semaphore, any directional arm pose classification"
+  code: |
+    import math
+
+    def compute_arm_angle(shoulder_x, shoulder_y, wrist_x, wrist_y):
+        """
+        Compute arm angle from shoulder to wrist.
+        Returns angle in degrees (0-360):
+          0 = straight down, 90 = right, 180 = up, 270 = left
+        """
+        dx = wrist_x - shoulder_x
+        dy = wrist_y - shoulder_y  # positive = downward in image coords
+        angle_rad = math.atan2(-dx, dy)  # clockwise from down
+        angle_deg = math.degrees(angle_rad)
+        if angle_deg < 0:
+            angle_deg += 360.0
+        return angle_deg
+
+    def discretize_angle(angle, step=45):
+        """Snap angle to nearest step-degree increment."""
+        discrete = round(angle / step) * step
+        if discrete >= 360:
+            discrete = 0
+        return int(discrete)
+
+rep_counting_state_machine:
+  description: "Phase-based rep counter using joint angles with per-track-ID state"
+  used_by: [workout_rep_counter]
+  when_to_use: "Exercise rep counting, cyclic motion detection, oscillation counting"
+  code: |
+    class RepState:
+        """Per-person rep counting state."""
+        def __init__(self):
+            self.phase = "up"   # "up" or "down"
+            self.rep_count = 0
+            self.current_angle = 0.0
+
+    # Exercise definitions: joint triplet + threshold angles
+    EXERCISES = {
+        "squat": {
+            "joint_triplet": ("left_hip", "left_knee", "left_ankle"),
+            "down_angle": 90,   # knee bent
+            "up_angle": 160,    # standing
+        },
+        "pushup": {
+            "joint_triplet": ("left_shoulder", "left_elbow", "left_wrist"),
+            "down_angle": 90,
+            "up_angle": 160,
+        },
+        "bicep_curl": {
+            "joint_triplet": ("left_shoulder", "left_elbow", "left_wrist"),
+            "down_angle": 160,  # arm extended
+            "up_angle": 40,     # arm curled
+        },
+    }
+
+    # In callback, per tracked person:
+    # state = track_states[track_id]
+    # angle = calculate_angle(p_a, p_b, p_c)
+    # if state.phase == "up" and angle <= down_angle:
+    #     state.phase = "down"
+    # elif state.phase == "down" and angle >= up_angle:
+    #     state.phase = "up"
+    #     state.rep_count += 1
+
+# ============================================================================
+# LINE CROSSING / TRIPWIRE COUNTING
+# ============================================================================
+
+line_crossing:
+  description: "Virtual line crossing counter with direction tracking"
+  used_by: [crowd_counting]
+  when_to_use: "Count objects crossing a boundary — entrance counters, traffic flow, corridor monitoring"
+  code: |
+    class LineCrossingState(app_callback_class):
+        def __init__(self, line_y=0.5):
+            super().__init__()
+            self.line_y = line_y          # Normalized Y position [0,1]
+            self.prev_positions = {}       # {track_id: y_center}
+            self.count_down = 0            # Crossed top->bottom
+            self.count_up = 0              # Crossed bottom->top
+            self.counted_ids = set()       # Avoid double-counting
+
+    # In callback:
+    def check_line_crossings(detections, user_data):
+        current_positions = {}
+        for detection in detections:
+            if detection.get_label() != "person":
+                continue
+            track = detection.get_objects_typed(hailo.HAILO_UNIQUE_ID)
+            if len(track) != 1:
+                continue
+            track_id = track[0].get_id()
+            bbox = detection.get_bbox()
+            y_center = bbox.ymin() + bbox.height() / 2.0
+            current_positions[track_id] = y_center
+
+        for track_id, y_center in current_positions.items():
+            if track_id in user_data.counted_ids:
+                continue
+            if track_id in user_data.prev_positions:
+                prev_y = user_data.prev_positions[track_id]
+                if prev_y < user_data.line_y <= y_center:
+                    user_data.count_down += 1
+                    user_data.counted_ids.add(track_id)
+                elif prev_y > user_data.line_y >= y_center:
+                    user_data.count_up += 1
+                    user_data.counted_ids.add(track_id)
+
+        user_data.prev_positions = current_positions
+        # Clean up counted IDs for departed tracks
+        user_data.counted_ids &= set(current_positions.keys())
+
+# ============================================================================
+# ZONE-BASED COUNTING (POLYGON REGIONS)
+# ============================================================================
+
+zone_polygon:
+  description: "Define polygon zones in normalized coords with point-in-polygon test"
+  used_by: [parking_lot_occupancy, retail_shelf_analyzer]
+  when_to_use: "Zone occupancy, region-of-interest counting, area-based alerts"
+  code: |
+    import json
+    import numpy as np
+
+    class Zone:
+        """A polygon region in normalized [0,1] coordinates."""
+
+        def __init__(self, name, polygon, capacity=1):
+            self.name = name
+            self.polygon = np.array(polygon, dtype=np.float32)
+            self.capacity = capacity
+            self.occupied_count = 0
+
+        def contains_point(self, x, y):
+            """Ray-casting point-in-polygon test."""
+            n = len(self.polygon)
+            inside = False
+            j = n - 1
+            for i in range(n):
+                xi, yi = self.polygon[i]
+                xj, yj = self.polygon[j]
+                if ((yi > y) != (yj > y)) and \
+                   (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
+                    inside = not inside
+                j = i
+            return inside
+
+        def contains_bbox_center(self, xmin, ymin, width, height):
+            """Check if bbox center falls in this zone."""
+            cx = xmin + width / 2.0
+            cy = ymin + height / 2.0
+            return self.contains_point(cx, cy)
+
+    def load_zones_from_json(json_path):
+        """Load zones from JSON: [{"name": "A", "polygon": [[x,y],...], "capacity": 5}, ...]"""
+        with open(json_path, "r") as f:
+            data = json.load(f)
+        return [Zone(e["name"], e["polygon"], e.get("capacity", 1)) for e in data]
+
+    def get_default_zones():
+        """Default 2x2 grid zones for demo."""
+        return [
+            Zone("Zone A", [[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]], 4),
+            Zone("Zone B", [[0.5, 0], [1, 0], [1, 0.5], [0.5, 0.5]], 4),
+            Zone("Zone C", [[0, 0.5], [0.5, 0.5], [0.5, 1], [0, 1]], 4),
+            Zone("Zone D", [[0.5, 0.5], [1, 0.5], [1, 1], [0.5, 1]], 4),
+        ]
+
+zone_overlay_drawing:
+  description: "Draw zone polygons on frame with color-coded occupancy status"
+  used_by: [parking_lot_occupancy]
+  when_to_use: "Visual zone overlay for any zone-based app"
+  code: |
+    import cv2
+    import numpy as np
+
+    def draw_zones_on_frame(frame, zones, frame_width, frame_height):
+        """Draw semi-transparent colored zone polygons with labels."""
+        for zone in zones:
+            is_full = zone.occupied_count >= zone.capacity
+
+            # Scale normalized polygon to pixel coords
+            pts = zone.polygon.copy()
+            pts[:, 0] *= frame_width
+            pts[:, 1] *= frame_height
+            pts = pts.astype(np.int32)
+
+            # Semi-transparent fill
+            overlay = frame.copy()
+            color = (0, 0, 255) if is_full else (0, 255, 0)
+            cv2.fillPoly(overlay, [pts], color)
+            cv2.addWeighted(overlay, 0.15, frame, 0.85, 0, frame)
+
+            # Border
+            cv2.polylines(frame, [pts], True, color, 2)
+
+            # Label at centroid
+            cx = int(pts[:, 0].mean())
+            cy = int(pts[:, 1].mean())
+            cv2.putText(frame, f"{zone.name}: {zone.occupied_count}/{zone.capacity}",
+                        (cx - 40, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+# ============================================================================
+# DEPTH-BASED PROXIMITY ALERTING
+# ============================================================================
+
+proximity_alert:
+  description: "Depth-based proximity detection with smoothing and cooldown"
+  used_by: [depth_proximity_alert]
+  when_to_use: "Obstacle avoidance, proximity warnings, safety zones around machinery"
+  code: |
+    import time
+    import numpy as np
+
+    ALERT_COOLDOWN_SECONDS = 1.0
+
+    class ProximityAlertState(app_callback_class):
+        def __init__(self, threshold=0.3, region=None):
+            super().__init__()
+            self.threshold = threshold
+            self.region = region  # (x, y, w, h) normalized, or None for center 50%
+            self.last_alert_time = 0.0
+            self.alert_active = False
+            self.depth_history = []
+            self.history_len = 10
+
+        def get_region_depth(self, depth_data):
+            """Extract depth from ROI (center 50% by default)."""
+            arr = np.array(depth_data)
+            if arr.ndim < 2:
+                return arr.flatten()
+            h, w = arr.shape[:2]
+            if self.region:
+                rx, ry, rw, rh = self.region
+                x1, y1 = int(rx * w), int(ry * h)
+                x2, y2 = int((rx + rw) * w), int((ry + rh) * h)
+            else:
+                x1, y1, x2, y2 = w // 4, h // 4, 3 * w // 4, 3 * h // 4
+            return arr[max(0,y1):min(h,y2), max(0,x1):min(w,x2)].flatten()
+
+        def check_proximity(self, depth_values):
+            """Returns (is_alert, smoothed_depth, current_depth)."""
+            if len(depth_values) == 0:
+                return False, 0.0, 0.0
+            current = float(np.percentile(depth_values, 5))
+            self.depth_history.append(current)
+            if len(self.depth_history) > self.history_len:
+                self.depth_history.pop(0)
+            smoothed = float(np.mean(self.depth_history))
+            return smoothed <= self.threshold, smoothed, current
+
+    # In callback:
+    # depth_masks = roi.get_objects_typed(hailo.HAILO_DEPTH_MASK)
+    # region_depth = state.get_region_depth(depth_masks[0].get_data())
+    # is_alert, smoothed, current = state.check_proximity(region_depth)
+    # if is_alert and (time.monotonic() - state.last_alert_time) >= ALERT_COOLDOWN_SECONDS:
+    #     print("** PROXIMITY ALERT **")
+    #     state.last_alert_time = time.monotonic()
+
+# ============================================================================
+# COMMON CALLBACK PATTERNS
+# ============================================================================
+
+detection_filter_and_track:
+  description: "Filter detections by label and extract track ID — the most common callback pattern"
+  used_by: [crowd_counting, parking_lot_occupancy, workout_rep_counter, retail_shelf_analyzer]
+  when_to_use: "Any detection-based app that needs label filtering and/or tracking"
+  code: |
+    import hailo
+
+    ALLOWED_LABELS = {"person"}  # or {"car", "truck", "bus", "motorcycle"}
+
+    def process_detections(buffer, user_data):
+        roi = hailo.get_roi_from_buffer(buffer)
+        detections = roi.get_objects_typed(hailo.HAILO_DETECTION)
+
+        for detection in detections:
+            label = detection.get_label()
+            if label not in ALLOWED_LABELS:
+                continue
+
+            confidence = detection.get_confidence()
+            bbox = detection.get_bbox()
+            # bbox coords are normalized [0,1]: xmin, ymin, width, height
+
+            # Get track ID (requires tracker in pipeline)
+            track_id = 0
+            track = detection.get_objects_typed(hailo.HAILO_UNIQUE_ID)
+            if len(track) == 1:
+                track_id = track[0].get_id()
+
+            # Get landmarks if pose model
+            landmarks = detection.get_objects_typed(hailo.HAILO_LANDMARKS)
+            if landmarks:
+                points = landmarks[0].get_points()
+                # Each point: point.x(), point.y() — relative to bbox
+
+            # Your processing here...
+
+per_track_state:
+  description: "Maintain per-tracked-object state across frames using a dict keyed by track ID"
+  used_by: [workout_rep_counter, crowd_counting, parking_lot_occupancy]
+  when_to_use: "Any app tracking state per object — counting, timing, classification history"
+  code: |
+    from hailo_apps.python.core.gstreamer.gstreamer_app import app_callback_class
+
+    class TrackedObjectState:
+        """State for one tracked object. Customize fields per app."""
+        def __init__(self):
+            self.first_seen_frame = 0
+            self.data = {}  # app-specific state
+
+    class TrackingCallbackData(app_callback_class):
+        def __init__(self):
+            super().__init__()
+            self.track_states = {}  # {track_id: TrackedObjectState}
+
+        def get_or_create(self, track_id):
+            if track_id not in self.track_states:
+                self.track_states[track_id] = TrackedObjectState()
+                self.track_states[track_id].first_seen_frame = self.get_count()
+            return self.track_states[track_id]
+
+        def cleanup_stale(self, active_ids, max_age=300):
+            """Remove states for objects not seen in max_age frames."""
+            current_frame = self.get_count()
+            stale = [tid for tid, s in self.track_states.items()
+                     if tid not in active_ids
+                     and (current_frame - s.first_seen_frame) > max_age]
+            for tid in stale:
+                del self.track_states[tid]
+
+custom_cli_args:
+  description: "Pattern for adding custom CLI arguments that work with the pipeline parser"
+  used_by: [crowd_counting, parking_lot_occupancy, depth_proximity_alert]
+  when_to_use: "Any app that needs custom command-line options beyond the base pipeline args"
+  code: |
+    # In main():
+    from hailo_apps.python.core.common.core import get_pipeline_parser
+
+    parser = get_pipeline_parser()
+    parser.add_argument("--my-threshold", type=float, default=0.5,
+                        help="Custom threshold value")
+    parser.add_argument("--my-config", default=None,
+                        help="Path to custom config JSON")
+
+    # Pre-parse to get custom args before pipeline construction
+    args, _ = parser.parse_known_args()
+
+    # Pass to callback state
+    user_data = MyCallbackData(threshold=args.my_threshold)
+    # Pass parser to pipeline app so it owns the full arg set
+    app = GStreamerMyApp(app_callback, user_data, parser=parser)
+    app.run()
+
+frame_overlay_text:
+  description: "Draw status text and counters on video frame using OpenCV"
+  used_by: [crowd_counting, parking_lot_occupancy, workout_rep_counter]
+  when_to_use: "Any pipeline app with --use-frame that needs on-screen status display"
+  code: |
+    import cv2
+    from hailo_apps.python.core.common.buffer_utils import (
+        get_caps_from_pad, get_numpy_from_buffer,
+    )
+
+    # In callback:
+    pad = element.get_static_pad("src")
+    format, width, height = get_caps_from_pad(pad)
+
+    frame = None
+    if user_data.use_frame and format and width and height:
+        frame = get_numpy_from_buffer(buffer, format, width, height)
+
+    # ... process detections ...
+
+    if user_data.use_frame and frame is not None:
+        # Status text
+        cv2.putText(frame, "Count: 42", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+
+        # Horizontal line (e.g., counting line)
+        line_y = int(0.5 * height)
+        cv2.line(frame, (0, line_y), (width, line_y), (255, 0, 0), 2)
+
+        # Per-detection label near bbox
+        text_x = int(bbox.xmin() * width)
+        text_y = max(20, int(bbox.ymin() * height) - 10)
+        cv2.putText(frame, "label", (text_x, text_y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+
+        # IMPORTANT: convert color space before setting frame
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        user_data.set_frame(frame)
+
+# ============================================================================
+# SIGNAL STABILIZATION
+# ============================================================================
+
+# ============================================================================
+# DISPLAY AND UI PATTERNS
+# ============================================================================
+
+web_control_panel:
+  description: "Flask web control panel for parameter adjustment alongside GStreamer/OpenCV video display"
+  used_by: []
+  when_to_use: "Any app where users need a web-based control panel (sliders, buttons, settings) while video displays via GStreamer/OpenCV window"
+  code: |
+    import threading
+    from flask import Flask, jsonify, request, render_template_string
+
+    # Shared state between pipeline callback and web server
+    class AppState:
+        def __init__(self):
+            self.threshold = 0.5
+            self.target_labels = ["person"]
+            self.count = 0
+            self.fps = 0.0
+            self.lock = threading.Lock()
+
+    app_state = AppState()
+
+    # Flask app (runs in background thread)
+    flask_app = Flask(__name__)
+
+    CONTROL_HTML = """
+    <!DOCTYPE html><html><head><title>App Control Panel</title>
+    <style>body{font-family:sans-serif;max-width:600px;margin:40px auto;padding:0 20px}
+    .slider-container{margin:20px 0} input[type=range]{width:100%}
+    .status{background:#f0f0f0;padding:15px;border-radius:8px;margin:20px 0}</style></head>
+    <body><h1>Control Panel</h1>
+    <div class="status" id="status">Loading...</div>
+    <div class="slider-container"><label>Confidence Threshold: <span id="thresh-val">0.5</span></label>
+    <input type="range" min="0" max="100" value="50" id="threshold"
+           oninput="document.getElementById('thresh-val').textContent=(this.value/100).toFixed(2);
+                    fetch('/api/threshold',{method:'POST',headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({value:this.value/100})})"></div>
+    <script>setInterval(()=>fetch('/api/status').then(r=>r.json()).then(d=>{
+    document.getElementById('status').innerHTML=
+    `Count: ${d.count} | FPS: ${d.fps.toFixed(1)} | Threshold: ${d.threshold}`}),1000)</script>
+    </body></html>"""
+
+    @flask_app.route("/")
+    def index():
+        return render_template_string(CONTROL_HTML)
+
+    @flask_app.route("/api/status")
+    def status():
+        with app_state.lock:
+            return jsonify(count=app_state.count, fps=app_state.fps, threshold=app_state.threshold)
+
+    @flask_app.route("/api/threshold", methods=["POST"])
+    def set_threshold():
+        data = request.get_json()
+        with app_state.lock:
+            app_state.threshold = float(data["value"])
+        return jsonify(ok=True)
+
+    def start_web_server(port=8080):
+        """Start Flask in a daemon thread. Call from main() before app.run()."""
+        thread = threading.Thread(target=lambda: flask_app.run(host="0.0.0.0", port=port, debug=False), daemon=True)
+        thread.start()
+        print(f"Web control panel at http://localhost:{port}")
+
+    # In main():
+    # start_web_server(port=8080)
+    # app = GStreamerMyApp(app_callback, user_data)  # Video displays via GStreamer
+    # app.run()
+
+    # In callback: read app_state.threshold for dynamic threshold
+
+hailooverlay_community_setup:
+  description: "YAML style config + Python custom color callback for hailooverlay_community"
+  used_by: []
+  when_to_use: "Pipeline apps needing per-class colors, sprites, label filtering, or stats overlay"
+  code: |
+    # --- overlay_style.yaml ---
+    # Place this file in your app directory
+    # styles:
+    #   person:
+    #     color: [0, 200, 255]        # cyan bbox
+    #     text_color: [255, 255, 255]  # white text
+    #     show_landmarks: true
+    #     show_bbox: true
+    #   car:
+    #     color: [255, 100, 0]        # orange bbox
+    #     show_landmarks: false
+    #   unknown:
+    #     color: [128, 128, 128]      # gray for unrecognized classes
+
+    # --- In pipeline class get_pipeline_string(): ---
+    # import os
+    # style_yaml = os.path.join(os.path.dirname(__file__), "overlay_style.yaml")
+    # display_pipeline = DISPLAY_PIPELINE(
+    #     video_sink=self.video_sink, sync=self.sync, show_fps=self.show_fps,
+    #     community_overlay=True,
+    #     overlay_props={
+    #         "style-config": style_yaml,
+    #         "min-confidence": "0.5",
+    #         "stats-overlay": "true",
+    #         "text-background": "true",
+    #     }
+    # )
+
+    # --- Custom per-detection colors from Python callback: ---
+    import hailo
+
+    def set_detection_color(detection, r, g, b):
+        """Attach a custom overlay color to a detection (for hailooverlay_community)."""
+        color_value = (r << 16) | (g << 8) | b  # Pack as 0xRRGGBB
+        color_cls = hailo.HailoClassification(
+            "overlay_color",   # type must be "overlay_color"
+            color_value,       # class_id = packed RGB
+            "",                # label (unused)
+            0.0,               # confidence (unused)
+        )
+        detection.add_object(color_cls)
+
+    # In callback:
+    # for detection in detections:
+    #     if detection.get_label() == "person":
+    #         set_detection_color(detection, 0, 255, 0)   # green for people
+    #     elif detection.get_label() == "car":
+    #         set_detection_color(detection, 255, 100, 0)  # orange for cars
+
+genai_web_ui:
+  description: "Gradio web UI for GenAI apps (chat interface with streaming text and optional image upload)"
+  used_by: []
+  when_to_use: "GenAI apps that need a web-based chat interface, image upload, or remote access"
+  code: |
+    import gradio as gr
+    # pip install gradio
+
+    # Assumes you have initialized: llm (LLM or VLM instance), conversation (list)
+
+    def chat_fn(message, history):
+        """Gradio chat function with streaming output."""
+        conversation.append(
+            {"role": "user", "content": [{"type": "text", "text": message}]}
+        )
+        full_response = ""
+        with llm.generate(prompt=conversation, temperature=0.7, max_generated_tokens=512) as stream:
+            for token in stream:
+                full_response += token
+                yield full_response  # Gradio streams partial responses
+        conversation.append(
+            {"role": "assistant", "content": [{"type": "text", "text": full_response}]}
+        )
+
+    def vlm_chat_fn(message, image, history):
+        """Gradio VLM chat with image upload."""
+        import cv2
+        import numpy as np
+        if image is not None:
+            # Gradio provides PIL Image, convert to numpy RGB
+            img_array = np.array(image)
+            img_resized = cv2.resize(img_array, (336, 336)).astype(np.uint8)
+            prompt = [
+                {"role": "user", "content": [
+                    {"type": "image"},
+                    {"type": "text", "text": message}
+                ]}
+            ]
+            response = vlm.generate_all(prompt=prompt, frames=[img_resized], temperature=0.1, max_generated_tokens=200)
+        else:
+            prompt = [{"role": "user", "content": [{"type": "text", "text": message}]}]
+            response = llm.generate_all(prompt=prompt, temperature=0.7, max_generated_tokens=256)
+        return response.split("<|im_end|>")[0]
+
+    # Launch LLM chat:
+    # demo = gr.ChatInterface(fn=chat_fn, title="Hailo AI Chat")
+    # demo.launch(server_name="0.0.0.0", server_port=7860)
+
+    # Launch VLM chat with image upload:
+    # with gr.Blocks() as demo:
+    #     gr.Markdown("# Hailo VLM Chat")
+    #     with gr.Row():
+    #         image_input = gr.Image(type="pil", label="Upload Image")
+    #         text_input = gr.Textbox(label="Question")
+    #     output = gr.Textbox(label="Response")
+    #     text_input.submit(vlm_chat_fn, [text_input, image_input, gr.State([])], output)
+    # demo.launch(server_name="0.0.0.0", server_port=7860)
+
+user_frame_pygame:
+  description: "Pattern for using --use-frame with pygame rendering instead of cv2.imshow"
+  used_by: []
+  when_to_use: "Pipeline apps needing pygame for custom graphics, game-like UI, or interactive displays"
+  code: |
+    import pygame
+    import numpy as np
+    import multiprocessing
+
+    def pygame_display_process(frame_queue, width=1280, height=720):
+        """Separate process for pygame rendering. Replaces default cv2.imshow display."""
+        pygame.init()
+        screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Hailo App")
+        clock = pygame.time.Clock()
+        running = True
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            try:
+                frame = frame_queue.get_nowait()  # Non-blocking
+                if frame is None:
+                    break
+                # frame is BGR from OpenCV, pygame expects RGB
+                frame_rgb = frame[:, :, ::-1]  # BGR -> RGB
+                frame_rgb = np.ascontiguousarray(frame_rgb)
+                surface = pygame.surfarray.make_surface(frame_rgb.swapaxes(0, 1))
+                surface = pygame.transform.scale(surface, (width, height))
+                screen.blit(surface, (0, 0))
+
+                # Draw custom pygame overlays here:
+                # pygame.draw.rect(screen, (255, 0, 0), (10, 10, 200, 50), 2)
+                # font = pygame.font.SysFont(None, 36)
+                # text = font.render("Custom Info", True, (0, 255, 0))
+                # screen.blit(text, (20, 20))
+
+                pygame.display.flip()
+            except Exception:
+                pass
+
+            clock.tick(30)
+
+        pygame.quit()
+
+    # In main():
+    # frame_queue = multiprocessing.Queue(maxsize=2)
+    # display_proc = multiprocessing.Process(target=pygame_display_process, args=(frame_queue,))
+    # display_proc.start()
+    #
+    # In callback (with --use-frame):
+    # frame = get_numpy_from_buffer(buffer, format, width, height)
+    # # Draw bboxes on frame first (important!)
+    # for det in detections:
+    #     bbox = det.get_bbox()
+    #     x1, y1 = int(bbox.xmin()*w), int(bbox.ymin()*h)
+    #     x2, y2 = int((bbox.xmin()+bbox.width())*w), int((bbox.ymin()+bbox.height())*h)
+    #     cv2.rectangle(frame, (x1,y1), (x2,y2), (0,255,0), 2)
+    # frame_queue.put(frame)
+    #
+    # In pipeline: replace DISPLAY_PIPELINE with 'fakesink sync=false'
+
+hybrid_overlay_plus_userframe:
+  description: "Pipeline with hailooverlay_community before callback for C++ bboxes + Python extras"
+  used_by: []
+  when_to_use: "Apps needing both fast bbox rendering and custom Python drawing (zones, counters, alerts)"
+  code: |
+    # In get_pipeline_string():
+    # The KEY is placing the overlay BEFORE the user callback identity element.
+    # This way, when the callback extracts the frame, bboxes are already drawn.
+
+    from hailo_apps.python.core.gstreamer.gstreamer_helper_pipelines import (
+        SOURCE_PIPELINE, INFERENCE_PIPELINE, INFERENCE_PIPELINE_WRAPPER,
+        TRACKER_PIPELINE, USER_CALLBACK_PIPELINE, OVERLAY_PIPELINE, QUEUE,
+    )
+
+    def get_pipeline_string(self):
+        source = SOURCE_PIPELINE(video_source=self.video_source)
+        inference = INFERENCE_PIPELINE(hef_path=self.hef_path, post_process_so=self.post_process_so,
+                                        post_function_name=self.post_function_name, batch_size=self.batch_size)
+        inference_wrapper = INFERENCE_PIPELINE_WRAPPER(inference)
+        tracker = TRACKER_PIPELINE(class_id=-1)
+
+        # OVERLAY BEFORE CALLBACK — bboxes rendered at C++ speed
+        overlay = OVERLAY_PIPELINE(community=True)
+        user_callback = USER_CALLBACK_PIPELINE()
+
+        # Note: no DISPLAY_PIPELINE here — we handle display manually
+        pipeline = (
+            f"{source} ! {inference_wrapper} ! {tracker} ! "
+            f"{overlay} ! {user_callback} ! "
+            f"videoconvert ! {QUEUE()} ! fpsdisplaysink video-sink={self.video_sink} sync={self.sync}"
+        )
+        return pipeline
+
+    # In callback:
+    # Frame already has bboxes drawn by hailooverlay_community!
+    # Just add your custom extras:
+    # if user_data.use_frame:
+    #     frame = get_numpy_from_buffer(buffer, format, width, height)
+    #     # Bboxes are already on the frame — add zones, counters, etc.
+    #     cv2.putText(frame, f"Zone A: {zone_a_count}", (10, 30), ...)
+    #     cv2.polylines(frame, [zone_polygon], True, (0, 255, 0), 2)
+    #     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    #     user_data.set_frame(frame)
+
+user_frame_with_detections:
+  description: "Draw bboxes/labels/landmarks from Hailo ROI metadata onto user-frame (no hailooverlay)"
+  used_by: []
+  when_to_use: "When using user-frame without hailooverlay and you need to manually draw detection info"
+  code: |
+    import cv2
+    import hailo
+    from hailo_apps.python.core.common.buffer_utils import get_caps_from_pad, get_numpy_from_buffer
+
+    # Color map for common COCO classes
+    LABEL_COLORS = {
+        "person": (0, 255, 0),
+        "car": (255, 100, 0),
+        "truck": (200, 100, 50),
+        "default": (0, 200, 255),
+    }
+
+    def draw_detections_on_frame(frame, detections, width, height):
+        """Draw bboxes, labels, confidence, and track IDs from Hailo metadata."""
+        for detection in detections:
+            label = detection.get_label()
+            confidence = detection.get_confidence()
+            bbox = detection.get_bbox()
+
+            # Convert normalized coords to pixels
+            x1 = int(bbox.xmin() * width)
+            y1 = int(bbox.ymin() * height)
+            x2 = int((bbox.xmin() + bbox.width()) * width)
+            y2 = int((bbox.ymin() + bbox.height()) * height)
+
+            color = LABEL_COLORS.get(label, LABEL_COLORS["default"])
+
+            # Draw bbox
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+
+            # Get track ID if available
+            track_id = 0
+            track = detection.get_objects_typed(hailo.HAILO_UNIQUE_ID)
+            if len(track) == 1:
+                track_id = track[0].get_id()
+
+            # Draw label + confidence + track ID
+            text = f"{label} {confidence:.0%}"
+            if track_id > 0:
+                text += f" ID:{track_id}"
+            text_y = max(15, y1 - 5)
+            cv2.putText(frame, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+            # Draw landmarks if present (pose keypoints)
+            landmarks = detection.get_objects_typed(hailo.HAILO_LANDMARKS)
+            for lm in landmarks:
+                for point in lm.get_points():
+                    px = int((point.x() * bbox.width() + bbox.xmin()) * width)
+                    py = int((point.y() * bbox.height() + bbox.ymin()) * height)
+                    cv2.circle(frame, (px, py), 3, (255, 0, 255), -1)
+
+    # In callback:
+    # pad = element.get_static_pad("src")
+    # format, width, height = get_caps_from_pad(pad)
+    # frame = get_numpy_from_buffer(buffer, format, width, height)
+    # roi = hailo.get_roi_from_buffer(buffer)
+    # detections = roi.get_objects_typed(hailo.HAILO_DETECTION)
+    # draw_detections_on_frame(frame, detections, width, height)
+    # frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    # user_data.set_frame(frame)
+
+fakesink_headless:
+  description: "Replace videosink with fakesink for headless mode or when using alternative display"
+  used_by: []
+  when_to_use: "Headless/server mode, alternative display (pygame, web), or when no video output needed"
+  code: |
+    # --- Option 1: CLI arg for headless mode ---
+    # In pipeline class __init__:
+    parser.add_argument("--headless", action="store_true",
+                        help="Run without GStreamer display (fakesink)")
+
+    # In get_pipeline_string():
+    if self.options_menu.headless:
+        # No overlay needed in headless mode (saves CPU)
+        display = "fakesink sync=false"
+    else:
+        display = DISPLAY_PIPELINE(video_sink=self.video_sink, sync=self.sync, show_fps=self.show_fps)
+
+    pipeline_string = f"{source} ! {inference_wrapper} ! {tracker} ! {user_callback} ! {display}"
+
+    # --- Option 2: Alternative display (pygame/web) with callback ---
+    # Keep the callback for frame extraction, send to fakesink
+    # In get_pipeline_string():
+    user_callback = USER_CALLBACK_PIPELINE()
+    pipeline_string = f"{source} ! {inference_wrapper} ! {tracker} ! {user_callback} ! fakesink sync=false"
+    # In main(): start pygame_display_process or web server that reads from user_data frame queue
+
+    # --- Option 3: File output instead of display ---
+    from hailo_apps.python.core.gstreamer.gstreamer_helper_pipelines import FILE_SINK_PIPELINE
+    # Replace DISPLAY_PIPELINE with:
+    display = FILE_SINK_PIPELINE(output_file="output.mkv", bitrate=8000)
+
+    # --- Option 4: Network streaming instead of display ---
+    from hailo_apps.python.core.gstreamer.gstreamer_helper_pipelines import VIDEO_STREAM_PIPELINE
+    # Replace DISPLAY_PIPELINE with:
+    display = VIDEO_STREAM_PIPELINE(port=5000, host="0.0.0.0")
+
+# ============================================================================
+# SIGNAL STABILIZATION
+# ============================================================================
+
+signal_stabilization:
+  description: "Require consistent classification for N frames before accepting (debounce)"
+  used_by: [semaphore_translator]
+  when_to_use: "Gesture recognition, signal decoding, any noisy per-frame classification that needs temporal smoothing"
+  code: |
+    class StabilizedClassifier:
+        """Accept a classification only after seeing it for N consecutive frames."""
+        def __init__(self, threshold=10):
+            self.threshold = threshold
+            self.last_value = None
+            self.stable_count = 0
+            self.confirmed_value = None
+
+        def update(self, value):
+            """Feed a new per-frame classification. Returns confirmed value or None."""
+            if value == self.last_value:
+                self.stable_count += 1
+            else:
+                self.last_value = value
+                self.stable_count = 1
+
+            if self.stable_count == self.threshold:
+                self.confirmed_value = value
+                return value  # Newly confirmed
+            return None  # Not yet stable
