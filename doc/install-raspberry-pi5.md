@@ -156,12 +156,12 @@ If `hailo` or `hailotools` are not found, try deleting the GStreamer registry:
 ```bash
 rm ~/.cache/gstreamer-1.0/registry.aarch64.bin
 ```
-##### If everything is OK you can continue installing the [hailo_rpi5_examples.](../README.md#configure-environment)
+##### If everything is OK you can continue with the [Installation Guide](../README.md#installation).
 
-Don't forget to update our GitHub repository to the latest version to get the latest examples and resources.
+Don't forget to update the repository to the latest version:
 ```bash
-cd [your-path]/hailo-rpi5-examples
-git pull
+cd [your-path]/hailo-community-projects
+git pull --recurse-submodules
 ```
 
 

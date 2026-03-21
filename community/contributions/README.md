@@ -6,12 +6,12 @@ Community-contributed optimization insights from real-world Hailo deployments.
 
 - **Help other developers** — your finding saves someone else hours of debugging
 - **Get credited** — your name appears in the git commit, PR, and contribution file
-- **Improve AI agents** — future `/profile-pipeline` sessions will suggest your recipe automatically
+- **Improve AI agents** — future `/hl-profile` sessions will suggest your recipe automatically
 - **Grow the knowledge base** — real-world insights are more valuable than any docs
 
 ## How Contributions Are Generated
 
-Contributions are created via the Claude Code `/contribute-insights` skill, typically at the end of an optimization session (e.g., after `/profile-pipeline`). The process:
+Contributions are created via the Claude Code `/hl-contribute` skill, typically at the end of an optimization session (e.g., after `/hl-profile`). The process:
 
 1. The agent formats the finding as a structured `.md` file
 2. Sensitive data (paths, IPs, credentials) is automatically scrubbed

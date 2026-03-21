@@ -3,25 +3,29 @@
 
 # Hailo Community Projects
 
-Welcome to the Hailo Community Projects repository. This project showcases community-contributed applications and examples demonstrating the capabilities of the Hailo AI processor on embedded devices.
-The examples are designed to work with the Raspberry Pi AI Kit and AI HAT, and x86_64 Ubuntu machines supporting both the Hailo8 (26 TOPS) and Hailo8L (13 TOPS) AI processors.
+The central hub for Hailo community development — community-contributed AI applications and **agentic AI development tooling** for Hailo edge accelerators.
+
+Built on top of [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) (included as a git submodule), this repo provides 20+ ready-to-run community apps, a growing knowledge base of real-world optimizations, and an AI-powered development framework that lets you build production-ready Hailo apps through natural language.
+
+Supports **Hailo-8** (26 TOPS), **Hailo-8L** (13 TOPS), and **Hailo-10H** (GenAI: LLM, VLM, Whisper + vision pipelines).
+
 Visit the [Hailo Official Website](https://hailo.ai/) and [Hailo Community Forum](https://community.hailo.ai/) for more information.
 
 ## Repository Structure
 
-This repository uses [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) as a **git submodule** providing the core framework, pipelines, and developer tools.
-
 ```
 hailo-community-projects/
-├── hailo-apps-infra/          # Git submodule — core framework & pipelines
+├── hailo-apps-infra/              # Git submodule — core framework & official apps
 ├── community/
-│   └── apps/
-│       ├── pipeline_apps/     # GStreamer real-time video community apps
-│       ├── standalone_apps/   # Lightweight HailoRT-only batch apps
-│       └── gen_ai_apps/       # Hailo GenAI community apps
-├── community_projects/        # Legacy community projects
-├── install.sh                 # Thin wrapper — delegates to hailo-apps-infra/install.sh
-└── setup_env.sh               # Activates venv and sets PYTHONPATH
+│   ├── apps/
+│   │   ├── pipeline_apps/         # 14 GStreamer real-time video community apps
+│   │   ├── standalone_apps/       # 5 lightweight HailoRT-only batch apps
+│   │   └── gen_ai_apps/           # 2 Hailo-10H GenAI community apps
+│   └── contributions/             # Community-shared optimization insights
+├── community_projects/            # Legacy community projects (games, robots, etc.)
+├── .hailo/                        # Shared agentic knowledge (cross-platform)
+├── install.sh                     # Thin wrapper → hailo-apps-infra/install.sh
+└── setup_env.sh                   # Activates venv and sets PYTHONPATH
 ```
 
 See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps-infra) for the full development guide and API reference.
@@ -83,9 +87,9 @@ See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps-
 
 Community apps are organized into three categories under `community/apps/`:
 
-- **Pipeline Apps** -- GStreamer real-time video applications (detection, pose, segmentation, etc.)
-- **Standalone Apps** -- Lightweight HailoRT-only batch processing applications
-- **GenAI Apps** -- Generative AI applications for Hailo
+- **Pipeline Apps** (14) — GStreamer real-time video apps (detection, tracking, pose analysis, multi-camera, etc.)
+- **Standalone Apps** (5) — Lightweight HailoRT-only batch processing apps
+- **GenAI Apps** (2) — Hailo-10H generative AI apps (VLM, voice)
 
 ```bash
 # Pipeline app
@@ -94,7 +98,7 @@ python community/apps/pipeline_apps/<app_name>/<app_name>.py --input usb
 # Standalone app
 python community/apps/standalone_apps/<app_name>/<app_name>.py --input path/to/video.mp4
 
-# GenAI app
+# GenAI app (Hailo-10H only)
 python community/apps/gen_ai_apps/<app_name>/<app_name>.py
 ```
 
@@ -102,8 +106,61 @@ See the [Community Apps README](community/apps/README.md) for the full list of a
 
 ## Legacy Community Projects
 
-Community-contributed projects from previous versions remain in `community_projects/`.
+Community-contributed projects from previous versions remain in `community_projects/` — including games, robots, and creative demos.
 Check out the [Community Projects](community_projects/community_projects.md) page for details.
+
+## Agentic AI Development
+
+This repository is designed for **agentic-first development**. AI coding agents can build complete, production-ready Hailo AI applications by following structured instructions, knowledge bases, and skill definitions — without manually writing code.
+
+### How It Works
+
+All shared agentic knowledge lives in `.hailo/` — a platform-neutral directory that works with any AI coding agent:
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| **Skills** | `.hailo/skills/` | 13 step-by-step workflow guides (hl- prefix) |
+| **Instructions** | `.hailo/instructions/` | Architecture, coding standards, orchestration |
+| **Toolsets** | `.hailo/toolsets/` | API references for Hailo SDK, GStreamer, VLM |
+| **Knowledge** | `.hailo/knowledge/` | App catalog, decision tree, code snippets, troubleshooting |
+| **Memory** | `.hailo/memory/` | Persistent cross-session knowledge from real sessions |
+| **Templates** | `.hailo/templates/` | Scaffold templates for pipeline, standalone, GenAI apps |
+| **Examples** | `.hailo/examples/` | Minimal runnable examples and callback patterns |
+
+See the [.hailo/ README](.hailo/README.md) for the complete index.
+
+### Supported Platforms
+
+| Platform | Entry Point | Skills Available |
+|----------|-------------|-----------------|
+| **Claude Code** | `CLAUDE.md` + `.claude/skills/hl-*/SKILL.md` | 7 slash commands (`/hl-build-app`, `/hl-profile`, etc.) |
+| **VS Code Copilot** | `.github/copilot-instructions.md` + `.github/prompts/hl-*.prompt.md` | 6 ready-to-use prompt templates |
+| **Cursor** | `.cursor/rules` | Full access to `.hailo/` knowledge |
+| **Any AI agent** | `.hailo/` directory | Read skills, instructions, and knowledge directly |
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `hl-build-app` | Build new Hailo AI apps (main builder with 7-phase workflow) |
+| `hl-build-vlm-app` | Build Vision-Language Model apps for Hailo-10H |
+| `hl-build-standalone-app` | Build standalone HailoRT inference apps |
+| `hl-build-agent-app` | Build AI agent apps with tool calling |
+| `hl-add-voice` | Add speech-to-text / text-to-speech to any app |
+| `hl-profile` | Profile GStreamer pipeline performance with GST-Shark |
+| `hl-contribute` | Share optimization insights with the community |
+| `hl-monitoring` | Continuous video monitoring pattern |
+| `hl-event-detection` | Event detection from VLM responses |
+| `hl-camera` | Camera setup and management |
+| `hl-model-management` | HEF model management and resolution |
+| `hl-plan-and-execute` | Orchestrated multi-phase workflow |
+| `hl-validate` | Validation and testing patterns |
+
+### Community Knowledge Base
+
+The `community/contributions/` directory contains real-world optimization insights shared by community members and AI agents. Each contribution is a structured Markdown file documenting a finding, its root cause, and the fix — with before/after metrics.
+
+See the [Contributions README](community/contributions/README.md) for how to contribute your own insights.
 
 ## Additional Examples and Resources
 
@@ -138,12 +195,35 @@ For training and deployment, see the [Hailo Model Zoo](https://github.com/hailo-
 
 ## Contributing
 
-We welcome contributions from the community:
-1. Build and share [Community Apps](community/apps/README.md).
-2. Contribute to [Legacy Community Projects](community_projects/community_projects.md).
-3. Report issues and bugs.
-4. Suggest new features or improvements.
-5. Join the discussion on the [Hailo Community Forum](https://community.hailo.ai/).
+We welcome contributions from the community! There are several ways to get involved:
+
+### Build Apps with AI Agents
+Use the agentic development tools to build new Hailo apps:
+- **Claude Code:** Run `/hl-build-app` to start the guided app builder
+- **VS Code Copilot:** Use the prompt templates in `.github/prompts/`
+- **Any agent:** Follow the skill docs in `.hailo/skills/`
+
+New apps are scaffolded in `community/apps/` automatically.
+
+### Share Optimization Insights
+After profiling or optimizing a pipeline, share your findings:
+- **Claude Code:** Run `/hl-contribute` to format and submit
+- **Manual:** Follow the [contribution format](community/contributions/README.md)
+
+### Other Ways to Contribute
+1. Build and share [Community Apps](community/apps/README.md)
+2. Contribute to [Legacy Community Projects](community_projects/community_projects.md)
+3. Report issues and bugs
+4. Suggest new features or improvements
+5. Join the discussion on the [Hailo Community Forum](https://community.hailo.ai/)
+
+## Hardware
+
+| Architecture | Value | Use Case |
+|---|---|---|
+| Hailo-8 | `hailo8` (26 TOPS) | Full performance, all pipeline + standalone apps |
+| Hailo-8L | `hailo8l` (13 TOPS) | Lower power, compatible model subset |
+| Hailo-10H | `hailo10h` | GenAI (LLM, VLM, Whisper) + vision pipelines |
 
 ## License
 

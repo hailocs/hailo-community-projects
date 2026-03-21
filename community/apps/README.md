@@ -1,6 +1,6 @@
 # Community Apps
 
-Example applications built with the `/app-builder` skill. These are separate from the main codebase (`hailo_apps/python/`) to ease maintenance and merging.
+Example applications built with the `/hl-build-app` skill and community contributors. These live separately from the core framework (`hailo-apps-infra/hailo_apps/`) to ease maintenance and merging.
 
 ## Structure
 
@@ -28,7 +28,7 @@ python community/apps/gen_ai_apps/<app_name>/<app_name>.py
 
 ## Apps
 
-### Pipeline Apps (13)
+### Pipeline Apps (14)
 | App | Description | Template |
 |-----|-------------|----------|
 | crowd_counting | Count people crossing a virtual line | detection |
@@ -44,6 +44,7 @@ python community/apps/gen_ai_apps/<app_name>/<app_name>.py
 | depth_proximity_alert | Depth-based closeness warning | depth |
 | multi_camera_store_monitor | 3-camera retail surveillance | multisource |
 | license_plate_reader | Detect plates + OCR text | paddle_ocr |
+| gesture_mouse | Hand gesture mouse control | gesture_detection |
 
 ### Standalone Apps (5)
 | App | Description | Template |
@@ -62,4 +63,4 @@ python community/apps/gen_ai_apps/<app_name>/<app_name>.py
 
 ## Building New Apps
 
-Use `/app-builder` to create new apps. They will be scaffolded in this directory automatically.
+Use `/hl-build-app` to create new apps with AI assistance, or follow the skill docs in `.hailo/skills/hl-build-app.md`. New apps are scaffolded in this directory automatically.
