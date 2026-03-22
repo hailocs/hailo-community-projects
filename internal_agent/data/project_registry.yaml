@@ -1,0 +1,1040 @@
+# ============================================================================
+# PROJECT REGISTRY — Single source of truth for all indexed Hailo projects
+# ============================================================================
+# This YAML drives the public HAILO_PROJECT_INDEX.md via generate_index.py.
+# Never edit the markdown directly — edit this file and regenerate.
+
+projects:
+
+  # ── HACKATHON WINNERS ────────────────────────────────────────────────────
+
+  - id: tailo
+    section: hackathon
+    name: "TAILO — AI-Powered Smart Pet Companion"
+    description: "Privacy-first pet monitoring with behavioral reinforcement, treat dispensing, and AI-driven camera tracking for multi-pet recognition and activity monitoring. 1st place, Hailo Hackathon 2025."
+    hardware: ["Hailo-8/8L", "AI HAT+", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/TAILO"
+    video_urls: ["https://www.youtube.com/watch?v=dAok4_63W8E"]
+    features: ["Pet tracking", "Treat dispensing", "Multi-pet recognition"]
+    tags: [hackathon, pet, monitoring, camera]
+
+  - id: tempo
+    section: hackathon
+    name: "TEMPO — AI Music from Heart Rate"
+    description: "AI-generated MIDI music tailored to your heartbeat with real-time synchronization to heart monitors. Applications in adaptive workout music and biofeedback. 2nd place, Hailo Hackathon 2025."
+    hardware: ["Hailo-8/8L", "AI HAT+", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/TEMPO"
+    video_urls: ["https://www.youtube.com/watch?v=nQr9nL7bH3k"]
+    features: ["MIDI generation", "Heart rate sync", "Biofeedback"]
+    tags: [hackathon, music, biofeedback, creative]
+
+  - id: ad-genie
+    section: hackathon
+    name: "AD GENIE — Personalized Advertisement"
+    description: "Offline AI system using CLIP outfit recognition to deliver fashion-based advertising recommendations on public displays — no cloud dependency. 3rd place, Hailo Hackathon 2025."
+    hardware: ["Hailo-8/8L", "AI HAT+", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-CLIP/tree/main/community_projects/ad_genie"
+    video_urls: ["https://www.youtube.com/watch?v=0_v2V7lV514"]
+    features: ["CLIP", "Outfit recognition", "Offline ads"]
+    tags: [hackathon, clip, retail, advertising]
+
+  - id: dynamic-captioning
+    section: hackathon
+    name: "Dynamic Captioning"
+    description: "Image captioning using Florence2 on Hailo-8 that updates when the scene changes."
+    hardware: ["Hailo-8", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/dynamic_captioning"
+    video_urls: ["https://www.youtube.com/watch?v=kLqhP2z9qtI"]
+    features: ["Florence2", "Scene-change aware"]
+    tags: [hackathon, captioning, vlm]
+
+  - id: navigaitor
+    section: hackathon
+    name: "NavigAItor"
+    description: "Autonomous robot navigation using visual landmarks without GPS."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/Navigator"
+    video_urls: ["https://www.youtube.com/watch?v=E0Z55e1KyOo"]
+    features: ["Visual SLAM", "No GPS", "Autonomous navigation"]
+    tags: [hackathon, robotics, navigation]
+
+  - id: baiby-monitor
+    section: hackathon
+    name: "B-AI-BY Monitor"
+    description: "Smart baby monitor with cry and activity detection using CLIP, real-time alerts."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-CLIP/tree/main/community_projects/baiby_monitor"
+    video_urls: ["https://www.youtube.com/watch?v=sXgL5g_A-u0"]
+    features: ["CLIP", "Cry detection", "Activity alerts"]
+    tags: [hackathon, baby, monitoring, clip]
+
+  - id: chessmate
+    section: hackathon
+    name: "ChessMate (RoboChess)"
+    description: "Fully automated robotic chess system with AI-powered piece detection."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/RoboChess"
+    video_urls: ["https://www.youtube.com/watch?v=aXNgmYCEgDc"]
+    features: ["Robotic arm", "Piece detection", "Full game play"]
+    tags: [hackathon, robotics, chess, game]
+
+  - id: hailogames
+    section: hackathon
+    name: "HailoGames (Sailted Fish)"
+    description: "'Red Light, Green Light' game using real-time pose estimation."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/sailted_fish"
+    video_urls: ["https://youtube.com/shorts/q8ZG8zzRlzE"]
+    features: ["Pose estimation", "Game logic"]
+    tags: [hackathon, game, pose]
+
+  # ── GENAI & LLM ─────────────────────────────────────────────────────────
+
+  - id: be-more-hailo
+    section: genai
+    name: "be-more-hailo — Local AI Agent"
+    description: "Fully local AI agent on Raspberry Pi 5 — listens for wake word ('Hey BMO'), understands speech via Whisper, reasons with Qwen 2.5 1.5B LLM, uses Qwen2-VL-2B for vision, responds with TTS. Features animated face GUI, timers, minigames, web interface, and Tailscale remote access."
+    hardware: ["Hailo-10H", "AI HAT+ 2", "Raspberry Pi 5"]
+    github_url: "https://github.com/moorew/be-more-hailo"
+    stars: 74
+    features: ["Wake word", "LLM", "VLM", "TTS", "Web UI", "Tailscale"]
+    tags: [genai, agent, llm, vlm, whisper, tts, hailo-10h]
+
+  - id: hailo-10h-llm-demo
+    section: genai
+    name: "Hailo-10H LLM Demo"
+    description: "ChatGPT-style interactive offline LLM chat using Ollama interface — no internet required."
+    hardware: ["Hailo-10H"]
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/llm-demo-with-hailo-10h-ai-accelerator/"
+    video_urls: ["https://www.youtube.com/watch?v=ENb7CiL-EYc"]
+    tags: [genai, llm, official, hailo-10h]
+
+  - id: hailo-10h-vlm-demo
+    section: genai
+    name: "Hailo-10H VLM Demo"
+    description: "Qwen2-VL (2B params) vision-language model for real-time image analysis, visual Q&A, and chatbots."
+    hardware: ["Hailo-10H"]
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/vlm-demo-with-hailo-10h-ai-accelerator/"
+    video_urls: ["https://www.youtube.com/watch?v=DkGeRaFxRSE"]
+    tags: [genai, vlm, official, hailo-10h]
+
+  - id: stable-diffusion-edge
+    section: genai
+    name: "Stable Diffusion on the Edge"
+    description: "Text-to-image generation with Stable Diffusion 1.5/2.1 running fully offline. Under 5 seconds per image at under 5W power."
+    hardware: ["Hailo-10H"]
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/hailo-10h-demo-stable-diffusion-on-the-edge/"
+    video_urls: ["https://www.youtube.com/watch?v=rsXylrnyNLM"]
+    tags: [genai, image-generation, stable-diffusion, official, hailo-10h]
+
+  - id: genai-rpi-hat2
+    section: genai
+    name: "On-device GenAI on RPi AI HAT+ 2"
+    description: "Full GenAI stack demo — LLM, VLM, image generation, and speech recognition all running locally on Raspberry Pi 5."
+    hardware: ["Hailo-10H", "AI HAT+ 2", "Raspberry Pi 5"]
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/on-device-genai-on-raspberry-pi-ai-hat-2-with-hailo-10h/"
+    video_urls: ["https://www.youtube.com/watch?v=8dwVnmcZ9v0"]
+    tags: [genai, llm, vlm, official, rpi, hailo-10h]
+
+  - id: asus-ugen300
+    section: genai
+    name: "ASUS UGen300 USB AI Accelerator"
+    description: "World's first USB edge AI accelerator for laptops — enables offline LLM, VLM, and classic vision workloads on any device."
+    hardware: ["Hailo-10H (USB)"]
+    status: production
+    partner: "ASUS"
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/asus-ugen300-powered-by-hailo-10h-on-device-ai-anywhere/"
+    video_urls: ["https://www.youtube.com/watch?v=Pg5hse3lfMs"]
+    tags: [genai, usb, product, official, hailo-10h]
+
+  - id: hailo-10h-multiservice
+    section: genai
+    name: "Hailo-10H Multi-Service AI Platform"
+    description: "Runs 8 concurrent AI services (vision, CLIP, Whisper, OCR, pose, depth, TTS, LLM) with intelligent device management, Gradio web portal, and Unix socket IPC."
+    hardware: ["Hailo-10H", "Raspberry Pi 5"]
+    github_url: "https://github.com/gregm123456/raspberry_pi_hailo_ai_services"
+    stars: 3
+    features: ["8 services", "Gradio portal", "Device manager"]
+    tags: [genai, multi-service, hailo-10h]
+
+  - id: rpi-hailo-hat-ollama
+    section: genai
+    name: "RPI-Hailo-Hat-Ollama"
+    description: "Run local LLMs (Llama 3.2, Qwen, DeepSeek) via Ollama-compatible API with Open WebUI on AI HAT+ 2."
+    hardware: ["Hailo-10H", "AI HAT+ 2", "Raspberry Pi 5"]
+    github_url: "https://github.com/DWestbury-PP/RPI-Hailo-Hat-Ollama"
+    features: ["Ollama", "Open WebUI", "systemd autostart"]
+    tags: [genai, llm, ollama, hailo-10h]
+
+  - id: hp-retail-ai
+    section: genai
+    name: "HP AI Accelerator for Retail"
+    description: "First commercial Hailo-10H solution for point-of-sale: cashier-less checkout, personalized ads, theft prevention."
+    hardware: ["Hailo-10H (M.2)"]
+    status: production
+    partner: "HP"
+    official_demo_url: "https://hailo.ai/company-overview/newsroom/news/hp-selects-hailos-next-gen-ai-accelerator-to-transform-retail-and-hospitality-operations/"
+    tags: [genai, retail, product, official, hailo-10h]
+
+  - id: pisovereign
+    section: genai
+    name: "PiSovereign — Privacy-First AI Assistant"
+    description: "Self-hosted, privacy-first AI assistant platform with Docker Compose. Built in Rust."
+    hardware: ["Hailo", "Raspberry Pi"]
+    github_url: "https://github.com/twohreichel/PiSovereign"
+    stars: 2
+    tags: [genai, privacy, rust, docker]
+
+  # ── SMART HOME & SURVEILLANCE ───────────────────────────────────────────
+
+  - id: frigate-nvr
+    section: smart_home
+    name: "Frigate NVR with Hailo"
+    description: "Complete local AI surveillance system — object detection, motion recording, face recognition, semantic search, PTZ control, Home Assistant integration. Official Hailo support since Frigate v0.16.0."
+    hardware: ["Hailo-8L", "AI HAT"]
+    github_url: "https://github.com/theNetworkChuck/frigate-nvr-guide"
+    stars: 286
+    features: ["AI detection", "HA integration", "Semantic search", "PTZ"]
+    tags: [surveillance, nvr, home-assistant, frigate]
+
+  - id: multi-camera-reid
+    section: smart_home
+    name: "Multi-Camera Multi-Person Re-Identification"
+    description: "Track the same individual across multiple cameras over time and location changes."
+    hardware: ["Hailo-8"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/multi-camera-multi-person-re-identification-demo/"
+    video_urls: ["https://www.youtube.com/watch?v=Gos90gTxaWw"]
+    tags: [surveillance, re-id, multi-camera, official]
+
+  - id: smart-city-analytics
+    section: smart_home
+    name: "Multi-Sensor Smart City Analytics"
+    description: "Multiple neural networks on multiple video streams simultaneously in real-time for smart city, ITS, retail, and industrial automation."
+    hardware: ["Hailo-8"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/multi-sensor-intelligent-video-analytics-for-smart-city/"
+    video_urls: ["https://www.youtube.com/watch?v=a70CR94c1ro"]
+    tags: [smart-city, multi-stream, analytics, official]
+
+  - id: 100-channel-vms
+    section: smart_home
+    name: "100-Channel VMS Analytics"
+    description: "100+ simultaneous video channels with AI analytics on an air-cooled 2U server."
+    hardware: ["8x dual Hailo-8 modules"]
+    partner: "Network Optix EVOS"
+    video_urls: ["https://www.youtube.com/watch?v=zdo8glzoKyo"]
+    tags: [enterprise, vms, multi-stream, official]
+
+  - id: mini-od-server
+    section: smart_home
+    name: "Mini Object Detection Server"
+    description: "CodeProject.AI-compatible REST API server for Frigate/Blue Iris NVR integration. 300-600MB RAM, Docker support, multiple YOLO models."
+    hardware: ["Hailo-8/8L"]
+    github_url: "https://github.com/serg987/hailo-mini-od-server"
+    stars: 20
+    features: ["REST API", "Docker", "Web UI", "CodeProject.AI compatible"]
+    tags: [surveillance, api, docker, nvr]
+
+  - id: hailo-libero-ha
+    section: smart_home
+    name: "Hailo Libero 3.0 for Home Assistant"
+    description: "HACS-compatible Home Assistant custom integration for Hailo devices."
+    hardware: ["Hailo"]
+    github_url: "https://github.com/voldemarpanso/ha_hailolibero"
+    stars: 8
+    features: ["HACS", "Home Assistant"]
+    tags: [smart-home, home-assistant, integration]
+
+  - id: hailohome
+    section: smart_home
+    name: "HailoHome — Smart Home AI"
+    description: "Fully offline smart home assistant with wake word detection, STT, TTS, face recognition, Home Assistant integration, and learning systems."
+    hardware: ["Hailo-8", "Raspberry Pi"]
+    github_url: "https://github.com/imvipgit/HailoHome"
+    stars: 1
+    features: ["Wake word", "STT", "TTS", "Face recognition", "HA integration"]
+    tags: [smart-home, assistant, offline]
+
+  - id: smart-retail
+    section: smart_home
+    name: "Smart Retail with reComputer"
+    description: "Intelligent retail system with YOLOv8n product detection, intrusion detection, Node-RED dashboard, and RS485 controls."
+    hardware: ["Hailo (AI Kit)"]
+    github_url: "https://github.com/Seeed-Projects/Smart-Retail-with-reComputerR11-and-AI-kit"
+    stars: 1
+    features: ["YOLOv8n", "Node-RED", "Intrusion detection"]
+    tags: [retail, dashboard, detection]
+
+  - id: dpm-hailo15
+    section: smart_home
+    name: "Dynamic Privacy Masking (Hailo-15)"
+    description: "Real-time 4K30 intelligent privacy masking detecting and masking people in busy scenes."
+    hardware: ["Hailo-15"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/dpm-with-hailo-15-ai-vision-processor/"
+    video_urls: ["https://www.youtube.com/watch?v=YYFCxhCQyuc"]
+    tags: [privacy, hailo-15, security, official]
+
+  - id: free-text-search
+    section: smart_home
+    name: "Free-Text Video Search (Hailo-15)"
+    description: "CLIP-based natural language search across recorded video. Search queries like 'person with red backpack near entrance.'"
+    hardware: ["Hailo-15"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/free-text-video-search-powered-by-hailo-15/"
+    video_urls: ["https://www.youtube.com/watch?v=Ocpqzuy2kI4"]
+    tags: [clip, search, hailo-15, security, official]
+
+  - id: evolv-xray
+    section: smart_home
+    name: "Evolv eXpedite AI X-Ray Screening"
+    description: "Autonomous threat detection in baggage screening for high-traffic venues."
+    hardware: ["Hailo-8 M.2"]
+    status: production
+    partner: "Evolv, Advantech"
+    official_demo_url: "https://hailo.ai/resources/industries/security/evolv-expedite-ai-powered-x-ray-bag-screening-with-hailo-8-m-2-ai-acceleration-module/"
+    video_urls: ["https://www.youtube.com/watch?v=-_QYrpPgKnM"]
+    tags: [security, xray, production, official]
+
+  - id: art-of-logic-city
+    section: smart_home
+    name: "Art of Logic City+ Smart City Security"
+    description: "10 IP cameras monitoring 65 parking spots in Sydney — 75-80% drop in repeat offenders. Solar/wind powered."
+    hardware: ["Hailo-8"]
+    status: production
+    partner: "Art of Logic"
+    official_demo_url: "https://hailo.ai/resources/industries/security/art-of-logic-city-smart-city-security-solution/"
+    tags: [smart-city, parking, production, official]
+
+  # ── COMPUTER VISION — DETECTION ─────────────────────────────────────────
+
+  - id: hailo-clip
+    section: detection
+    name: "CLIP Zero-Shot Classification"
+    description: "Real-time zero-shot classification using CLIP — type any text prompt and match it against live video. Three modes: full-frame, person, face. Includes threshold slider and probability bars."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/hailo-ai/hailo-CLIP"
+    stars: 29
+    video_urls: ["https://www.youtube.com/watch?v=XXizBHtCLew"]
+    features: ["Zero-shot", "3 modes", "Threshold slider"]
+    tags: [clip, zero-shot, classification, official]
+
+  - id: yolo-hailo10h
+    section: detection
+    name: "YOLO 4K Detection on Hailo-10H"
+    description: "Real-time YOLO object detection on 4K video streams using Hailo-10H."
+    hardware: ["Hailo-10H"]
+    official_demo_url: "https://hailo.ai/resources/industries/personal-compute/object-detection-demo-with-hailo-10h-ai-accelerator/"
+    video_urls: ["https://www.youtube.com/watch?v=2W7IUimI-IQ"]
+    tags: [detection, yolo, 4k, official, hailo-10h]
+
+  - id: yolo-hailo8
+    section: detection
+    name: "YOLO on Hailo-8"
+    description: "YOLOv5m running real-time at ultra-low power consumption on Hailo-8."
+    hardware: ["Hailo-8"]
+    video_urls: ["https://www.youtube.com/watch?v=X4xcEUKaA0o"]
+    tags: [detection, yolo, official]
+
+  - id: rpi5-detection
+    section: detection
+    name: "Real-Time Detection on RPi5 + AI HAT+"
+    description: "Cutting-edge AI performance for developers doing real-time computer vision on Raspberry Pi 5."
+    hardware: ["Hailo-8", "AI HAT+", "Raspberry Pi 5"]
+    video_urls: ["https://www.youtube.com/watch?v=m0O1r1ijFjk"]
+    tags: [detection, rpi, official]
+
+  - id: rpi-aikit-detection
+    section: detection
+    name: "Detection with RPi AI Kit"
+    description: "Fast, power-efficient AI processing with the $70 Raspberry Pi AI Kit."
+    hardware: ["Hailo-8L", "AI Kit", "Raspberry Pi 5"]
+    video_urls: ["https://www.youtube.com/watch?v=-huMW13Fp7U"]
+    tags: [detection, rpi, ai-kit, official]
+
+  - id: face-recognition-api
+    section: detection
+    name: "Face Recognition API"
+    description: "512-dimension face embedding generation at 3-18ms latency. Uses ArcFace + SCRFD models with SQLite vector DB. 28 tests."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/Seeed-Solution/face-recognition-api"
+    features: ["REST API", "ArcFace", "SCRFD", "Vector DB"]
+    tags: [face, recognition, api, embeddings]
+
+  - id: yolov11-tracker
+    section: detection
+    name: "YOLOv11 Tracker with Speed & Loitering"
+    description: "Real-time detection with ByteTrack tracking, speed estimation, and loitering detection. Web dashboard included."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/Seeed-Projects/YOLOv11-Hailo-Tracker"
+    stars: 6
+    features: ["ByteTrack", "Speed estimation", "Loitering detection", "Web dashboard"]
+    tags: [detection, tracking, analytics]
+
+  - id: emotion-detection
+    section: detection
+    name: "Real-Time Emotion Detection"
+    description: "7-class facial emotion detection at 30-40 FPS with 15-20ms latency. INT8 quantized, FER2013 benchmark (61.7%)."
+    hardware: ["Hailo-8", "Raspberry Pi 5"]
+    github_url: "https://github.com/NecheSeTopper/hailo8-realtime-emotion-detection"
+    stars: 1
+    features: ["7 emotions", "30-40 FPS", "INT8"]
+    tags: [emotion, face, classification]
+
+  - id: lpr-high-speed
+    section: detection
+    name: "License Plate Recognition (High-Speed)"
+    description: "3-network pipeline (vehicle detection + plate detection + LPRNet OCR) on GStreamer, real-time 1080p."
+    hardware: ["Hailo-8"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/license-plate-recognition-for-high-speed-vehicles/"
+    tags: [lpr, ocr, gstreamer, multi-model, official]
+
+  # ── POSE, SEGMENTATION & DEPTH ──────────────────────────────────────────
+
+  - id: pose-estimation-rpi
+    section: pose_seg_depth
+    name: "Pose Estimation on Raspberry Pi"
+    description: "Real-time human body keypoint detection and pose analysis on Raspberry Pi with Hailo."
+    hardware: ["Hailo-8/8L", "AI HAT+", "Raspberry Pi 5"]
+    official_demo_url: "https://hailo.ai/resources/industries/security/raspberry-pi-ai-kit-pose-estimation/"
+    video_urls: ["https://www.youtube.com/watch?v=xL013eHuSeI"]
+    tags: [pose, rpi, official]
+
+  - id: segmentation-rpi
+    section: pose_seg_depth
+    name: "Subject Segmentation on Raspberry Pi"
+    description: "Real-time image segmentation on single-board computer."
+    hardware: ["Hailo-8/8L", "AI Kit"]
+    official_demo_url: "https://hailo.ai/resources/industries/automotive/raspberry-pi-ai-kit-subject-segmentation/"
+    tags: [segmentation, rpi, official]
+
+  - id: depth-mono
+    section: pose_seg_depth
+    name: "Depth + Detection from Mono Camera"
+    description: "Combined depth estimation and object detection from a single camera — useful for automotive and industrial."
+    hardware: ["Hailo-8"]
+    official_demo_url: "https://ai.hailo.ai/depth-estimation-and-object-detection-for-mono-camera"
+    tags: [depth, detection, mono, official]
+
+  - id: hailo-bev
+    section: pose_seg_depth
+    name: "Bird's Eye View Perception"
+    description: "Multi-view 3D object detection for autonomous driving, based on PETR architecture."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/hailo-ai/hailo-BEV"
+    stars: 16
+    tags: [bev, 3d, automotive, official]
+
+  # ── ROBOTICS & DRONES ───────────────────────────────────────────────────
+
+  - id: hailo-tappas-ros2
+    section: robotics
+    name: "Hailo TAPPAS + ROS2"
+    description: "Combines Hailo TAPPAS and ROS2 for edge AI in robotics — YOLO, face recognition, object detection with ROS2 Jazzy. Docker container available."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/kyrikakis/hailo_tappas_ros2"
+    stars: 34
+    features: ["ROS2 Jazzy", "Docker", "YOLO", "Face recognition"]
+    tags: [ros2, robotics, docker]
+
+  - id: limelight4
+    section: robotics
+    name: "Limelight 4 — AI Robot Controller"
+    description: "Zero-code smart camera and robot controller for FIRST Robotics competitions."
+    hardware: ["Hailo-8", "RPi CM5"]
+    partner: "Limelight Vision"
+    official_demo_url: "https://hailo.ai/resources/industries/security/limelight-4-ai-powered-robot-controller/"
+    video_urls: ["https://www.youtube.com/watch?v=GUFeYl4cV04"]
+    tags: [robotics, first, competition, official]
+
+  - id: px4-ros2-payload-drop
+    section: robotics
+    name: "PX4-ROS2 Drone Payload Drop"
+    description: "PX4 + ROS2 autonomous payload-drop system with YOLOv8 real-time detection. Includes Gazebo simulation."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/GAUTHAMPSANKAR/PX4-ROS2-hailo-payload-drop"
+    stars: 4
+    features: ["PX4", "ROS2", "YOLOv8", "Gazebo sim"]
+    tags: [drone, ros2, autonomous]
+
+  - id: opencastor
+    section: robotics
+    name: "OpenCastor — AI Robotics Framework"
+    description: "Open-source AI robotics framework with tiered brain, 8 AI providers, multi-robot swarm, and self-improving loop."
+    hardware: ["Hailo", "OAK-D"]
+    github_url: "https://github.com/craigm26/OpenCastor"
+    stars: 15
+    features: ["Swarm robotics", "8 AI providers", "Self-improving"]
+    tags: [robotics, swarm, framework]
+
+  - id: husqvarna
+    section: robotics
+    name: "Husqvarna Automower with Hailo-8"
+    description: "AI-powered autonomous lawn mower with real-time obstacle detection, no cloud needed."
+    hardware: ["Hailo-8"]
+    status: production
+    partner: "Husqvarna"
+    official_demo_url: "https://hailo.ai/resources/industries/industrial-automation/smarter-autonomy-at-the-edge-husqvarna-automower-with-hailo-8/"
+    video_urls: ["https://www.youtube.com/watch?v=auBB_o1GCeU"]
+    tags: [robotics, autonomous, lawn, production, official]
+
+  - id: gapbot
+    section: robotics
+    name: "GAP-Bot Agricultural Hexapod"
+    description: "Edge AI hexapod robot for agricultural automation using ROS2."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/PelleNybe/CoraxCoLABs-GAP-GreenAutomatedPlatform---GAPbot"
+    stars: 2
+    features: ["ROS2", "Hexapod", "AgTech"]
+    tags: [robotics, agriculture, ros2]
+
+  - id: klevor
+    section: robotics
+    name: "Klevor — WRO Competition Robot"
+    description: "Autonomous robotics using YOLOv11 for WRO 2025 competition."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/teamsteelbot/klevor"
+    stars: 1
+    features: ["YOLOv11", "WRO"]
+    tags: [robotics, competition]
+
+  - id: rpi-nxt2
+    section: robotics
+    name: "Lego NXT2 + Hailo"
+    description: "Lego NXT2 C/C++ firmware with AI capabilities via RPi5 + Hailo."
+    hardware: ["Hailo-8", "Raspberry Pi 5"]
+    github_url: "https://github.com/schnaggelz/rpi-nxt2"
+    stars: 2
+    tags: [robotics, lego, education]
+
+  - id: drones-hailo
+    section: robotics
+    name: "Hailo AI for Drones"
+    description: "People counting, face detection on drone platform (Astrial board)."
+    hardware: ["Hailo-8", "Hailo-15"]
+    partner: "System Electronics"
+    official_demo_url: "https://hailo.ai/resources/industries/drones/hailo-ai-processors-for-drones/"
+    tags: [drone, detection, official]
+
+  # ── INDUSTRIAL & RETAIL ──────────────────────────────────────────────────
+
+  - id: visionsort
+    section: industrial
+    name: "VisionSort-RPi — Conveyor Belt Sorting"
+    description: "Conveyor belt sorting system using YOLOv8 for real-time object detection and automated sorting."
+    hardware: ["Hailo-8", "Raspberry Pi"]
+    github_url: "https://github.com/GBR-RL/VisionSort-RPi"
+    stars: 5
+    features: ["YOLOv8", "Automated sorting"]
+    tags: [industrial, sorting, manufacturing]
+
+  - id: xplorer
+    section: industrial
+    name: "Xplorer Industrial Controller"
+    description: "Rugged industrial and marine edge IoT/AIoT controller with GNSS, Zigbee, 4G LTE, NMEA2000, Frigate, and Home Assistant integration."
+    hardware: ["Hailo", "RPi5/CM5"]
+    github_url: "https://github.com/austral-electronics/Xplorer"
+    stars: 9
+    features: ["GNSS", "Zigbee", "4G", "Frigate", "HA"]
+    tags: [industrial, iot, marine, rugged]
+
+  - id: br-smart-camera
+    section: industrial
+    name: "B&R AI Smart Camera"
+    description: "Industrial camera for manufacturing: optical inspection, anomaly detection, sorting, OCR, pick & place."
+    hardware: ["Hailo"]
+    partner: "B&R"
+    official_demo_url: "https://hailo.ai/resources/industries/industrial-automation/ai-smart-camera-for-real-time-automation/"
+    tags: [industrial, inspection, manufacturing, official]
+
+  - id: idein-retail
+    section: industrial
+    name: "Idein AI Cast Smart Camera (Retail)"
+    description: "Retail analytics camera deployed in Japanese retail chains (Sogo & Seibu). Customer counting, journey tracking, shoplifting detection."
+    hardware: ["Hailo-8"]
+    status: production
+    partner: "Idein, AISIN (Toyota Group)"
+    official_demo_url: "https://hailo.ai/resources/industries/retail/idein-ai-cast-smart-camera/"
+    tags: [retail, analytics, production, official]
+
+  # ── AUTOMOTIVE & ADAS ────────────────────────────────────────────────────
+
+  - id: surround-perception
+    section: automotive
+    name: "L2-L3 Full Surround Perception"
+    description: "6x 2MP cameras, 3D detection and Bird's Eye View for ADAS and automated driving."
+    hardware: ["Hailo-8", "Renesas V4H"]
+    official_demo_url: "https://hailo.ai/resources/industries/automotive/l2-l3-full-surround-perception-for-adas-and-automated-driving/"
+    tags: [automotive, adas, bev, 3d, official]
+
+  - id: percivai-radar
+    section: automotive
+    name: "PercivAI Radar-Based 3D Perception"
+    description: "Low-cost radar 3D perception for detecting free space and objects in darkness and severe weather."
+    hardware: ["Hailo"]
+    status: production
+    partner: "PercivAI"
+    official_demo_url: "https://hailo.ai/resources/industries/automotive/percivai-radar-based-3d-perception/"
+    tags: [automotive, radar, 3d, production, official]
+
+  - id: tier-iv-lidar
+    section: automotive
+    name: "Tier IV LiDAR + Camera Sensor Fusion"
+    description: "Long-range pedestrian detection with on-device anonymization."
+    hardware: ["Hailo"]
+    status: production
+    partner: "Tier IV"
+    official_demo_url: "https://hailo.ai/resources/industries/automotive/tier-iv-lidar-and-camera-sensor-fusion-for-high-accuracy-perception/"
+    tags: [automotive, lidar, fusion, production, official]
+
+  - id: tt-control
+    section: automotive
+    name: "TT Control Ruggedized ECU"
+    description: "6-camera surround views protecting workers near industrial machinery."
+    hardware: ["Hailo"]
+    status: production
+    partner: "TT Control"
+    official_demo_url: "https://hailo.ai/resources/industries/automotive/tt-control-ruggedized-ecu-for-off-road-vehicles/"
+    tags: [automotive, safety, off-road, production, official]
+
+  # ── HEALTHCARE ───────────────────────────────────────────────────────────
+
+  - id: akara-surgical
+    section: healthcare
+    name: "Akara AI Sensor — Surgical Intelligence"
+    description: "Privacy-preserving surgical event tracking in hospitals. Automates procedure documentation with thermal sensors."
+    hardware: ["Hailo-8"]
+    status: production
+    partner: "Akara"
+    official_demo_url: "https://hailo.ai/resources/industries/healthcare/akara-ai-sensor-privacy-preserving-surgical-intelligence-powered-by-hailo-8/"
+    video_urls: ["https://www.youtube.com/watch?v=rQHs5Ym2VvA"]
+    tags: [healthcare, surgery, privacy, production, official]
+
+  - id: needletrainer
+    section: healthcare
+    name: "Intelligent Ultrasound NeedleTrainer"
+    description: "AI-enhanced ultrasound training for regional anesthesia — real-time anatomical segmentation overlays during needle insertion practice. Licensed as medical device in UK/EU/US."
+    hardware: ["Hailo-8"]
+    partner: "Intelligent Ultrasound"
+    official_demo_url: "https://hailo.ai/resources/industries/other/intelligent-ultrasound-needletrainer/"
+    tags: [healthcare, ultrasound, medical-device, official]
+
+  # ── WILDLIFE ─────────────────────────────────────────────────────────────
+
+  - id: pi-hailo-wildlife-3
+    section: wildlife
+    name: "Pi Hailo Wildlife Camera v3"
+    description: "Wildlife video capture with pre-capture buffer, detection masking, camera zoom, and autostart. Records MP4 when animals are detected."
+    hardware: ["Hailo-8L", "Hailo-10H", "Raspberry Pi 5"]
+    github_url: "https://github.com/Gordon999/Pi_Hailo_Wildlife_3"
+    stars: 2
+    features: ["Pre-capture buffer", "Detection masking", "Zoom", "Autostart"]
+    tags: [wildlife, camera, detection]
+
+  - id: pi-hailo-wildlife
+    section: wildlife
+    name: "Pi Hailo Wildlife Camera (Original)"
+    description: "Original wildlife video capture system with configurable animal detection and GPIO LED indicator."
+    hardware: ["Hailo-8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/Gordon999/Pi_Hailo_Wildlife"
+    stars: 2
+    features: ["MP4 capture", "GPIO LED"]
+    tags: [wildlife, camera, detection]
+
+  # ── SPEECH ───────────────────────────────────────────────────────────────
+
+  - id: hailo-whisper
+    section: speech
+    name: "Hailo Whisper — Speech-to-Text"
+    description: "Tools to export, convert, and evaluate OpenAI Whisper on Hailo accelerators. Supports tiny/base models, multilingual and English-only."
+    hardware: ["Hailo-8", "Hailo-8L", "Hailo-10H"]
+    github_url: "https://github.com/hailocs/hailo-whisper"
+    stars: 19
+    video_urls: ["https://www.youtube.com/watch?v=rbSKieDLrw4"]
+    features: ["Whisper tiny/base", "Multilingual", "Evaluation scripts"]
+    tags: [speech, whisper, asr]
+
+  # ── CREATIVE & FUN ──────────────────────────────────────────────────────
+
+  - id: edge-ai-art
+    section: creative
+    name: "Edge AI Art Generator"
+    description: "Real-time style transfer on live video from USB camera with dynamic style switching."
+    hardware: ["Hailo", "Raspberry Pi 5"]
+    github_url: "https://github.com/hrishikeshgokhale01/Edge-AI-Art-Generator"
+    stars: 3
+    features: ["Style transfer", "Live video", "Dynamic switching"]
+    tags: [creative, style-transfer, art]
+
+  - id: squid-game-doll
+    section: creative
+    name: "Squid Game Doll — Red Light, Green Light"
+    description: "'Red Light, Green Light' robot using YOLOv8/YOLOv11 + ByteTrack for player recognition with ESP32."
+    hardware: ["Hailo-8L", "Raspberry Pi 5"]
+    github_url: "https://github.com/fablab-bergamo/squid-game-doll"
+    stars: 2
+    features: ["YOLOv8", "ByteTrack", "ESP32"]
+    tags: [creative, game, pose, fun]
+
+  # ── TOOLS & UTILITIES ───────────────────────────────────────────────────
+
+  - id: hailo-converter
+    section: tools
+    name: "HailoConverter — ONNX to HEF"
+    description: "Docker image to convert ONNX YOLOv8s models to Hailo HEF format using Dataflow Compiler v3.28.0."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/cyclux/HailoConverter"
+    stars: 7
+    features: ["Docker", "Calibration quantization"]
+    tags: [tool, conversion, docker, model]
+
+  - id: hailo-gcp
+    section: tools
+    name: "Hailo Custom Model via GCP"
+    description: "Deploy custom models on RPi5 Hailo-8L using Google Colab and GCP — no local x86/GPU needed. Free-tier workflow."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/marcory-hub/hailo_gcp"
+    stars: 5
+    features: ["Google Colab", "Free tier", "148 commits"]
+    tags: [tool, cloud, training, model]
+
+  - id: hailo-yolo-inference
+    section: tools
+    name: "HAILO-YOLO-INFERENCE for RPi5"
+    description: "Step-by-step guide for verifying ONNX to HEF conversion with side-by-side comparison. Docker-based."
+    hardware: ["Hailo-8/8L"]
+    github_url: "https://github.com/rybkady/HAILO-YOLO-INFERENCE-for-RPi5"
+    stars: 6
+    features: ["ONNX vs HEF comparison", "Docker"]
+    tags: [tool, validation, model]
+
+  - id: hailo-toolbox
+    section: tools
+    name: "Hailo Toolbox"
+    description: "Comprehensive model conversion and inference toolkit with ONNX-to-HEF, multi-task inference, CLI and Python API."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/Seeed-Projects/hailo_toolbox"
+    stars: 6
+    features: ["CLI", "Python API", "Multi-task"]
+    tags: [tool, conversion, inference]
+
+  - id: hailo-yolo-guide
+    section: tools
+    name: "Hailo YOLO Guide"
+    description: "Three-stage guide to convert and inference YOLO models on Hailo. Includes sample HEF."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/seapanda0/hailo-yolo-guide"
+    stars: 4
+    features: ["3-stage workflow", "Sample HEF"]
+    tags: [tool, guide, model]
+
+  - id: hailo-model-generator
+    section: tools
+    name: "Hailo Model Generator"
+    description: "Complete YOLOv8 training-to-deployment pipeline for Hailo-8 HEF model generation."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/arsatyants/hailo_model_generator"
+    stars: 3
+    features: ["End-to-end pipeline"]
+    tags: [tool, training, deployment]
+
+  - id: piaikit-compiler
+    section: tools
+    name: "PiAIKitCompiler"
+    description: "Jupyter Notebook-based workflow to convert custom YOLO models to HEF for Hailo-8L."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/Eagleshot/PiAIKitCompiler"
+    stars: 4
+    features: ["Jupyter", "Step-by-step"]
+    tags: [tool, notebook, conversion]
+
+  - id: k8s-device-plugin
+    section: tools
+    name: "Kubernetes Device Plugin"
+    description: "K8s Device Plugin for Hailo AI accelerators — enables edge MLOps and container orchestration."
+    hardware: ["Hailo"]
+    github_url: "https://github.com/gllm-dev/hailo-device-plugin"
+    stars: 1
+    features: ["Go", "Kubernetes"]
+    tags: [tool, kubernetes, mlops]
+
+  - id: hailo-docker-ubuntu
+    section: tools
+    name: "Hailo Docker Ubuntu"
+    description: "Hailo Runtime + TAPPAS framework in Ubuntu 24.04 Docker image."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/jpm-canonical/hailo-docker-ubuntu"
+    stars: 4
+    features: ["Docker", "Ubuntu 24.04"]
+    tags: [tool, docker, runtime]
+
+  - id: hailo-10h-dashboard
+    section: tools
+    name: "Hailo-10H Web Dashboard"
+    description: "Real-time web-based monitoring dashboard for Hailo-10H device status."
+    hardware: ["Hailo-10H", "Raspberry Pi 5"]
+    github_url: "https://github.com/kristoffersingleton/RPI-Hailo-10H-Web-Dashboard"
+    stars: 4
+    features: ["Web UI", "Real-time monitoring"]
+    tags: [tool, dashboard, monitoring, hailo-10h]
+
+  - id: zig-hailo
+    section: tools
+    name: "Zig-Hailo — Zig Language Bindings"
+    description: "Zig reimplementation of some HailoRT functions."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/ssttevee/zig-hailo"
+    stars: 2
+    features: ["Zig"]
+    tags: [tool, bindings, zig]
+
+  - id: viam-hailo
+    section: tools
+    name: "Viam Modular Resource for RPi AI Kit"
+    description: "Viam robotics platform integration for Raspberry Pi AI Kit and AI HAT+."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/HipsterBrown/viam-pi-hailo-ml"
+    stars: 4
+    features: ["Viam platform"]
+    tags: [tool, viam, robotics]
+
+  # ── TUTORIALS ────────────────────────────────────────────────────────────
+
+  - id: seeed-zero-to-hero
+    section: tutorials
+    name: "AI Kit: Zero to Hero (Seeed)"
+    description: "Step-by-step guide from setup to Ollama integration on Raspberry Pi with Hailo AI Kit."
+    hardware: ["Hailo-8/8L"]
+    github_url: "https://github.com/Seeed-Projects/Tutorial-of-AI-Kit-with-Raspberry-Pi-From-Zero-to-Hero"
+    stars: 289
+    features: ["Detection", "Pose", "Segmentation", "Ollama"]
+    tags: [tutorial, beginner, comprehensive]
+
+  - id: degirum-examples
+    section: tutorials
+    name: "DeGirum Hailo Examples"
+    description: "DeGirum PySDK usage examples with Jupyter notebooks and benchmarking."
+    hardware: ["Hailo-8/8L"]
+    github_url: "https://github.com/DeGirum/hailo_examples"
+    stars: 57
+    features: ["Jupyter", "PySDK", "Benchmarks"]
+    tags: [tutorial, jupyter, sdk]
+
+  - id: zynqmp-hailo
+    section: tutorials
+    name: "Zynq UltraScale+ with Hailo-8"
+    description: "FPGA reference design combining Zynq UltraScale+ MPSoC with Hailo-8 for multi-camera YOLOv5."
+    hardware: ["Hailo-8 (M.2)"]
+    github_url: "https://github.com/fpgadeveloper/zynqmp-hailo-ai"
+    stars: 34
+    features: ["FPGA", "4 cameras", "PetaLinux", "Vivado"]
+    tags: [tutorial, fpga, reference-design]
+
+  - id: benchmarking-yolov8
+    section: tutorials
+    name: "Benchmarking YOLOv8 on RPi + Hailo"
+    description: "Object detection, segmentation, and pose estimation benchmarks on RPi CM4 with Hailo-8L."
+    hardware: ["Hailo-8L"]
+    github_url: "https://github.com/Seeed-Projects/Benchmarking-YOLOv8-on-Raspberry-PI-reComputer-r1000-and-AIkit-Hailo-8L"
+    stars: 27
+    features: ["Benchmarks", "Multiple tasks"]
+    tags: [tutorial, benchmark, performance]
+
+  - id: gstreamer-examples
+    section: tutorials
+    name: "GStreamer Examples with Hailo"
+    description: "Image processing pipelines using GStreamer, DeepStream, and Hailo."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/JarnoRalli/gstreamer-examples"
+    stars: 9
+    features: ["GStreamer", "Tracking", "Pipelines"]
+    tags: [tutorial, gstreamer, pipeline]
+
+  - id: jevois-pro
+    section: tutorials
+    name: "JeVois-Pro Smart Camera"
+    description: "Open-source standalone AI smart camera with Hailo-8 M.2. 31 TOPS combined. YOLOv7 640x640 at 11.5fps, YOLOv5m at 40fps."
+    hardware: ["Hailo-8"]
+    github_url: "https://github.com/jevois/jevois"
+    stars: 157
+    features: ["Standalone camera", "31 TOPS", "Multi-framework"]
+    tags: [camera, standalone, multi-framework]
+
+  # ── YOUTUBE SHOWCASES & TUTORIALS ──────────────────────────────────────
+
+  - id: yt-jeff-geerling-ai-kit
+    section: youtube_tutorials
+    name: "Testing Raspberry Pi's AI Kit — 13 TOPS for $70"
+    description: "Jeff Geerling tests the Hailo-8L AI Kit, runs YOLO object detection, and builds a 51 TOPS CoPilot+ PC — without Windows."
+    hardware: ["Hailo-8L", "AI Kit", "Raspberry Pi 5"]
+    channel: "Jeff Geerling"
+    video_urls: ["https://www.youtube.com/watch?v=HgIMJbN0DS0"]
+    tags: [youtube, tutorial, review, jeff-geerling]
+
+  - id: yt-genai-hat2
+    section: youtube_tutorials
+    name: "On-device GenAI on Raspberry Pi AI HAT+ 2"
+    description: "Full GenAI stack demo — LLM chat, VLM image understanding, Stable Diffusion, and Whisper speech-to-text, all running locally on a $130 board."
+    hardware: ["Hailo-10H", "AI HAT+ 2", "Raspberry Pi 5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=8dwVnmcZ9v0"]
+    tags: [youtube, genai, official, hailo-10h]
+
+  - id: yt-llm-demo
+    section: youtube_tutorials
+    name: "LLM Chat Running Offline on Hailo-10H"
+    description: "ChatGPT-style interactive LLM chat with Ollama interface — completely offline, no cloud needed."
+    hardware: ["Hailo-10H"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=ENb7CiL-EYc"]
+    tags: [youtube, genai, llm, hailo-10h]
+
+  - id: yt-vlm-demo
+    section: youtube_tutorials
+    name: "Qwen2-VL Vision-Language Model on Hailo-10H"
+    description: "Real-time image analysis and visual Q&A with a 2B parameter VLM running on edge hardware."
+    hardware: ["Hailo-10H"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=DkGeRaFxRSE"]
+    tags: [youtube, genai, vlm, hailo-10h]
+
+  - id: yt-stable-diffusion
+    section: youtube_tutorials
+    name: "Stable Diffusion on Edge — Text to Image in 5 Seconds"
+    description: "Stable Diffusion 1.5 running fully offline on Hailo-10H. Under 5W power, no cloud."
+    hardware: ["Hailo-10H"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=rsXylrnyNLM"]
+    tags: [youtube, genai, stable-diffusion, hailo-10h]
+
+  - id: yt-clip-demo
+    section: youtube_tutorials
+    name: "CLIP Zero-Shot Classification — Type Anything, Detect It Live"
+    description: "Real-time zero-shot classification: type any text prompt and see it matched against live video. Three modes: full-frame, person, face."
+    hardware: ["Hailo-8/8L", "Raspberry Pi 5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=XXizBHtCLew"]
+    tags: [youtube, clip, zero-shot]
+
+  - id: yt-whisper
+    section: youtube_tutorials
+    name: "Whisper Speech Recognition on Raspberry Pi + Hailo"
+    description: "OpenAI Whisper running on-device with Hailo acceleration. Live microphone transcription in a web app."
+    hardware: ["Hailo-8", "AI HAT+", "Raspberry Pi 5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=rbSKieDLrw4"]
+    tags: [youtube, speech, whisper]
+
+  - id: yt-yolo-hailo8
+    section: youtube_tutorials
+    name: "YOLO Real-Time Object Detection on Hailo-8"
+    description: "YOLOv5m running in real-time at ultra-low power. See how 26 TOPS transforms edge AI."
+    hardware: ["Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=X4xcEUKaA0o"]
+    tags: [youtube, detection, yolo]
+
+  - id: yt-rpi5-detection
+    section: youtube_tutorials
+    name: "Real-Time Object Recognition on RPi 5 + AI HAT+"
+    description: "Bringing cutting-edge AI performance to developers on Raspberry Pi 5."
+    hardware: ["Hailo-8", "AI HAT+", "Raspberry Pi 5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=m0O1r1ijFjk"]
+    tags: [youtube, detection, rpi]
+
+  - id: yt-pose-estimation
+    section: youtube_tutorials
+    name: "AI Pose Estimation on Raspberry Pi"
+    description: "Real-time human body keypoint detection and pose analysis running on edge."
+    hardware: ["Hailo-8/8L", "AI HAT+", "Raspberry Pi 5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=xL013eHuSeI"]
+    tags: [youtube, pose, rpi]
+
+  - id: yt-husqvarna
+    section: youtube_tutorials
+    name: "Husqvarna Automower — AI Lawn Mowing with Hailo-8"
+    description: "Production autonomous lawn mower with real-time obstacle detection. No cloud, no fuss — just AI at the edge."
+    hardware: ["Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=auBB_o1GCeU"]
+    tags: [youtube, robotics, production]
+
+  - id: yt-privacy-masking
+    section: youtube_tutorials
+    name: "Dynamic Privacy Masking at 4K30 — Hailo-15"
+    description: "Intelligent real-time privacy masking detecting and blurring people in busy office scenes."
+    hardware: ["Hailo-15"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=YYFCxhCQyuc"]
+    tags: [youtube, privacy, hailo-15]
+
+  - id: yt-free-text-search
+    section: youtube_tutorials
+    name: "Free-Text Video Search — 'Person with Red Backpack'"
+    description: "CLIP-powered natural language search across recorded video. Type what you're looking for."
+    hardware: ["Hailo-15"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=Ocpqzuy2kI4"]
+    tags: [youtube, clip, search, hailo-15]
+
+  - id: yt-multi-camera-reid
+    section: youtube_tutorials
+    name: "Multi-Camera Person Re-Identification"
+    description: "Track the same individual across multiple cameras over time and location."
+    hardware: ["Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=Gos90gTxaWw"]
+    tags: [youtube, re-id, surveillance]
+
+  - id: yt-100-channels
+    section: youtube_tutorials
+    name: "100 Video Channels — AI Analytics on One Server"
+    description: "100+ simultaneous video streams with AI on an air-cooled 2U server using 8x dual Hailo-8 modules."
+    hardware: ["8x dual Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=zdo8glzoKyo"]
+    tags: [youtube, enterprise, vms]
+
+  - id: yt-smart-city
+    section: youtube_tutorials
+    name: "Smart City — Multi-Sensor Video Analytics"
+    description: "Multiple neural networks on multiple video streams simultaneously for smart city, traffic, and retail."
+    hardware: ["Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=a70CR94c1ro"]
+    tags: [youtube, smart-city, multi-stream]
+
+  - id: yt-limelight4
+    section: youtube_tutorials
+    name: "Limelight 4 — Zero-Code AI Robot Controller"
+    description: "Smart camera for FIRST Robotics competitions, powered by RPi CM5 + Hailo-8."
+    hardware: ["Hailo-8", "RPi CM5"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=GUFeYl4cV04"]
+    tags: [youtube, robotics, first]
+
+  - id: yt-akara-surgical
+    section: youtube_tutorials
+    name: "AI-Powered Surgical Intelligence — Akara"
+    description: "Privacy-preserving surgical event tracking in hospitals using thermal sensors and Hailo-8."
+    hardware: ["Hailo-8"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=rQHs5Ym2VvA"]
+    tags: [youtube, healthcare, production]
+
+  - id: yt-asus-ugen300
+    section: youtube_tutorials
+    name: "ASUS UGen300 — USB AI Accelerator for Any Laptop"
+    description: "World's first USB edge AI stick with Hailo-10H. Run LLMs and vision AI on any device, offline."
+    hardware: ["Hailo-10H (USB)"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=Pg5hse3lfMs"]
+    tags: [youtube, usb, product]
+
+  - id: yt-evolv-xray
+    section: youtube_tutorials
+    name: "AI X-Ray Bag Screening — Evolv eXpedite"
+    description: "Autonomous threat detection in baggage screening for stadiums and high-traffic venues. In production."
+    hardware: ["Hailo-8 M.2"]
+    channel: "Hailo"
+    video_urls: ["https://www.youtube.com/watch?v=-_QYrpPgKnM"]
+    tags: [youtube, security, production]

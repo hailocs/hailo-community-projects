@@ -1,0 +1,605 @@
+# ============================================================================
+# PROJECT GRADES — Quality scores for all indexed Hailo community projects
+# ============================================================================
+# This is the single source of truth for project grading.
+# Grades drive ordering in the public index and visibility decisions.
+#
+# Scoring: 0 (none) to 3 (excellent) per dimension
+# Weights: code_quality=25%, community_signal=20%, freshness=20%,
+#          completeness=20%, hailo_integration=15%
+# Thresholds: A (2.5+), B (1.8-2.49), C (1.0-1.79), D (<1.0)
+# D-grade projects are excluded from public index.
+
+projects:
+
+  # ── HACKATHON WINNERS ────────────────────────────────────────────────────
+
+  - id: tailo
+    name: "TAILO — AI-Powered Smart Pet Companion"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/TAILO"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 2
+      completeness: 3
+      hailo_integration: 3
+    grade: A
+    grade_score: 2.40
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Hackathon 1st place. Full demo with video."
+
+  - id: tempo
+    name: "TEMPO — AI Music from Heart Rate"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/TEMPO"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 2
+      completeness: 3
+      hailo_integration: 2
+    grade: B
+    grade_score: 2.20
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Hackathon 2nd place. Creative biofeedback concept."
+
+  - id: ad-genie
+    name: "AD GENIE — Personalized Advertisement"
+    github_url: "https://github.com/hailo-ai/hailo-CLIP/tree/main/community_projects/ad_genie"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 2
+      completeness: 3
+      hailo_integration: 3
+    grade: A
+    grade_score: 2.40
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Hackathon 3rd place. Uses CLIP for outfit matching."
+
+  - id: dynamic-captioning
+    name: "Dynamic Captioning"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/dynamic_captioning"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Florence2 on Hailo-8. Scene-change aware captioning."
+
+  - id: navigaitor
+    name: "NavigAItor"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/Navigator"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Robot navigation without GPS using visual landmarks."
+
+  - id: baiby-monitor
+    name: "B-AI-BY Monitor"
+    github_url: "https://github.com/hailo-ai/hailo-CLIP/tree/main/community_projects/baiby_monitor"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Smart baby monitor using CLIP for cry/activity detection."
+
+  - id: chessmate
+    name: "ChessMate (RoboChess)"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/RoboChess"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Full robotic chess system."
+
+  - id: hailogames
+    name: "HailoGames (Sailted Fish)"
+    github_url: "https://github.com/hailo-ai/hailo-rpi5-examples/tree/main/community_projects/sailted_fish"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.55
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Red Light Green Light game with pose estimation."
+
+  # ── GENAI & LLM ─────────────────────────────────────────────────────────
+
+  - id: be-more-hailo
+    name: "be-more-hailo — Local AI Agent"
+    github_url: "https://github.com/moorew/be-more-hailo"
+    scores:
+      code_quality: 2
+      community_signal: 3
+      freshness: 3
+      completeness: 3
+      hailo_integration: 3
+    grade: A
+    grade_score: 2.75
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "74 stars. Full local agent stack: wake word, LLM, VLM, TTS."
+
+  - id: rpi-hailo-hat-ollama
+    name: "RPI-Hailo-Hat-Ollama"
+    github_url: "https://github.com/DWestbury-PP/RPI-Hailo-Hat-Ollama"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.55
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Ollama + AI HAT+ 2 setup guide."
+
+  - id: hailo-10h-multiservice
+    name: "Hailo-10H Multi-Service AI Platform"
+    github_url: "https://github.com/gregm123456/raspberry_pi_hailo_ai_services"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "8 concurrent AI services with Gradio portal."
+
+  - id: pisovereign
+    name: "PiSovereign — Privacy-First AI"
+    github_url: "https://github.com/twohreichel/PiSovereign"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 2
+      completeness: 1
+      hailo_integration: 1
+    grade: C
+    grade_score: 1.20
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Early stage. Rust + Docker."
+
+  # ── SMART HOME & SURVEILLANCE ───────────────────────────────────────────
+
+  - id: frigate-nvr
+    name: "Frigate NVR with Hailo"
+    github_url: "https://github.com/theNetworkChuck/frigate-nvr-guide"
+    scores:
+      code_quality: 3
+      community_signal: 3
+      freshness: 2
+      completeness: 3
+      hailo_integration: 2
+    grade: A
+    grade_score: 2.70
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "286 stars. Complete guide. Official Hailo support since Frigate v0.16."
+
+  - id: hailohome
+    name: "HailoHome — Smart Home AI"
+    github_url: "https://github.com/imvipgit/HailoHome"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.35
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Offline smart home assistant. Early stage."
+
+  - id: hailo-libero-ha
+    name: "Hailo Libero 3.0 for Home Assistant"
+    github_url: "https://github.com/voldemarpanso/ha_hailolibero"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 2.00
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "8 stars. HACS-compatible HA integration."
+
+  - id: mini-od-server
+    name: "Mini Object Detection Server"
+    github_url: "https://github.com/serg987/hailo-mini-od-server"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 1
+      completeness: 3
+      hailo_integration: 2
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "20 stars. CodeProject.AI compatible. Docker."
+
+  - id: pi-comp-vision
+    name: "Auto-Tracking Person Detection"
+    github_url: "https://github.com/Stonej29/pi-comp-vision"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 1
+      completeness: 1
+      hailo_integration: 1
+    grade: D
+    grade_score: 0.95
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Minimal code. 2 stars."
+
+  # ── COMPUTER VISION — DETECTION ─────────────────────────────────────────
+
+  - id: hailo-clip
+    name: "CLIP Zero-Shot Classification"
+    github_url: "https://github.com/hailo-ai/hailo-CLIP"
+    scores:
+      code_quality: 3
+      community_signal: 2
+      freshness: 2
+      completeness: 3
+      hailo_integration: 3
+    grade: A
+    grade_score: 2.65
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "29 stars. Official Hailo repo. 3 modes, threshold slider."
+
+  - id: emotion-detection
+    name: "Real-Time Emotion Detection"
+    github_url: "https://github.com/NecheSeTopper/hailo8-realtime-emotion-detection"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.55
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "7-class detection at 30-40 FPS."
+
+  - id: yolov11-tracker
+    name: "YOLOv11 Tracker with Speed & Loitering"
+    github_url: "https://github.com/Seeed-Projects/YOLOv11-Hailo-Tracker"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "ByteTrack + speed estimation + loitering detection."
+
+  - id: face-recognition-api
+    name: "Face Recognition API"
+    github_url: "https://github.com/Seeed-Solution/face-recognition-api"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 1
+      completeness: 3
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "512-dim embeddings, 3-18ms, ArcFace+SCRFD, 28 tests."
+
+  # ── ROBOTICS & DRONES ───────────────────────────────────────────────────
+
+  - id: hailo-tappas-ros2
+    name: "Hailo TAPPAS + ROS2"
+    github_url: "https://github.com/kyrikakis/hailo_tappas_ros2"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 1
+      completeness: 3
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.20
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "34 stars. ROS2 Jazzy + Docker."
+
+  - id: px4-ros2-payload-drop
+    name: "PX4-ROS2 Drone Payload Drop"
+    github_url: "https://github.com/GAUTHAMPSANKAR/PX4-ROS2-hailo-payload-drop"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Autonomous drone with YOLOv8 + Gazebo sim."
+
+  - id: opencastor
+    name: "OpenCastor — AI Robotics Framework"
+    github_url: "https://github.com/craigm26/OpenCastor"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 3
+      completeness: 2
+      hailo_integration: 1
+    grade: B
+    grade_score: 2.00
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "15 stars. Multi-robot swarm. Hailo is one of 8 AI providers."
+
+  - id: gapbot
+    name: "GAP-Bot Agricultural Hexapod"
+    github_url: "https://github.com/PelleNybe/CoraxCoLABs-GAP-GreenAutomatedPlatform---GAPbot"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 3
+      completeness: 1
+      hailo_integration: 1
+    grade: C
+    grade_score: 1.30
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Early stage hexapod robotics + ROS2."
+
+  # ── WILDLIFE ─────────────────────────────────────────────────────────────
+
+  - id: pi-hailo-wildlife-3
+    name: "Pi Hailo Wildlife Camera v3"
+    github_url: "https://github.com/Gordon999/Pi_Hailo_Wildlife_3"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Pre-capture buffer, zoom, detection masking."
+
+  # ── TOOLS & UTILITIES ───────────────────────────────────────────────────
+
+  - id: hailo-converter
+    name: "HailoConverter — ONNX to HEF"
+    github_url: "https://github.com/cyclux/HailoConverter"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: B
+    grade_score: 1.85
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "7 stars. Docker-based model conversion."
+
+  - id: hailo-gcp
+    name: "Hailo Custom Model via GCP"
+    github_url: "https://github.com/marcory-hub/hailo_gcp"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 3
+      hailo_integration: 2
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "148 commits. Free-tier cloud workflow."
+
+  - id: hailo-toolbox
+    name: "Hailo Toolbox"
+    github_url: "https://github.com/Seeed-Projects/hailo_toolbox"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.60
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "ONNX-to-HEF with CLI and Python API."
+
+  - id: k8s-device-plugin
+    name: "Kubernetes Device Plugin"
+    github_url: "https://github.com/gllm-dev/hailo-device-plugin"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 1
+    grade: C
+    grade_score: 1.60
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Go. Edge MLOps / K8s."
+
+  # ── TUTORIALS ────────────────────────────────────────────────────────────
+
+  - id: seeed-zero-to-hero
+    name: "AI Kit: Zero to Hero (Seeed)"
+    github_url: "https://github.com/Seeed-Projects/Tutorial-of-AI-Kit-with-Raspberry-Pi-From-Zero-to-Hero"
+    scores:
+      code_quality: 3
+      community_signal: 3
+      freshness: 2
+      completeness: 3
+      hailo_integration: 2
+    grade: A
+    grade_score: 2.70
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "289 stars. Comprehensive tutorial series."
+
+  - id: degirum-examples
+    name: "DeGirum Hailo Examples"
+    github_url: "https://github.com/DeGirum/hailo_examples"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 1
+      completeness: 3
+      hailo_integration: 2
+    grade: B
+    grade_score: 2.05
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "57 stars. Jupyter notebooks with PySDK."
+
+  - id: zynqmp-hailo
+    name: "Zynq UltraScale+ with Hailo-8"
+    github_url: "https://github.com/fpgadeveloper/zynqmp-hailo-ai"
+    scores:
+      code_quality: 3
+      community_signal: 2
+      freshness: 3
+      completeness: 3
+      hailo_integration: 3
+    grade: A
+    grade_score: 2.80
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "34 stars. FPGA + Hailo multi-camera reference design."
+
+  # ── CREATIVE & FUN ──────────────────────────────────────────────────────
+
+  - id: edge-ai-art
+    name: "Edge AI Art Generator"
+    github_url: "https://github.com/hrishikeshgokhale01/Edge-AI-Art-Generator"
+    scores:
+      code_quality: 1
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.35
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Real-time style transfer on live video."
+
+  - id: squid-game-doll
+    name: "Squid Game Doll"
+    github_url: "https://github.com/fablab-bergamo/squid-game-doll"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.60
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Red Light Green Light with YOLOv8 + ByteTrack + ESP32."
+
+  # ── INDUSTRIAL ───────────────────────────────────────────────────────────
+
+  - id: visionsort
+    name: "VisionSort-RPi"
+    github_url: "https://github.com/GBR-RL/VisionSort-RPi"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 1
+      completeness: 2
+      hailo_integration: 2
+    grade: C
+    grade_score: 1.60
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Conveyor belt sorting with YOLOv8."
+
+  - id: xplorer
+    name: "Xplorer Industrial Controller"
+    github_url: "https://github.com/austral-electronics/Xplorer"
+    scores:
+      code_quality: 2
+      community_signal: 1
+      freshness: 2
+      completeness: 2
+      hailo_integration: 1
+    grade: C
+    grade_score: 1.60
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "Rugged IoT/AIoT controller."
+
+  # ── SPEECH ───────────────────────────────────────────────────────────────
+
+  - id: hailo-whisper
+    name: "Hailo Whisper"
+    github_url: "https://github.com/hailocs/hailo-whisper"
+    scores:
+      code_quality: 2
+      community_signal: 2
+      freshness: 1
+      completeness: 2
+      hailo_integration: 3
+    grade: B
+    grade_score: 2.00
+    last_graded: "2026-03-21"
+    graded_by: manual
+    notes: "19 stars. Official Hailo community repo."
