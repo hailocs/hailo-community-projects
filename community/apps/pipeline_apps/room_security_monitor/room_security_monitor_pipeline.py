@@ -91,6 +91,10 @@ class GStreamerRoomSecurityMonitorApp(GStreamerApp):
             choices=['run', 'train', 'delete'],
             help="Application mode: run (monitor), train (enroll faces), delete (clear DB)"
         )
+        parser.add_argument(
+            "--ui", action='store_true', default=False,
+            help="Launch graphical enrollment panel (kid-friendly UI for adding faces)"
+        )
 
         # Configure --hef-path for multi-model support (face detection + face recognition)
         configure_multi_model_hef_path(parser)
@@ -399,8 +403,29 @@ class GStreamerRoomSecurityMonitorApp(GStreamerApp):
                 return True
         return False
 
+    def force_reclassify(self, track_id):
+        """Force a track to be re-classified on the next frame.
+
+        Called after enrollment so the overlay immediately shows the new name
+        instead of staying "Unknown".
+        """
+        if track_id is not None:
+            # Reset frame count so the next callback triggers a DB lookup
+            self.track_id_frame_count[track_id] = self.skip_frames
+            # Remove stale classification from the tracker
+            try:
+                tracker_name = self.tracker.get_trackers_list()[0]
+                self.tracker.remove_classifications_from_track(
+                    tracker_name, track_id, 'face_recon',
+                )
+            except Exception:
+                pass  # Tracker may not have this track anymore
+
     def vector_db_callback(self, pad, info, user_data):
-        """Run mode callback: search vector DB for face embeddings, classify."""
+        """Run mode callback: search vector DB for face embeddings, classify.
+
+        Also stores face data (embedding + crop) in user_data for real-time enrollment.
+        """
         tracker_name = self.tracker.get_trackers_list()[0]
         buffer = info.get_buffer()
         if buffer is None:
@@ -454,6 +479,17 @@ class GStreamerRoomSecurityMonitorApp(GStreamerApp):
                 self.tracker.add_object_to_track(
                     tracker_name, track_id, new_classification,
                 )
+
+            # Store face data for real-time enrollment
+            if hasattr(user_data, 'store_enrollable_face'):
+                try:
+                    cropped = self.crop_frame(frame, detection.get_bbox(), width, height)
+                    if cropped.size > 0:
+                        user_data.store_enrollable_face(
+                            track_id, embedding_vector, cropped, label=person['label'],
+                        )
+                except Exception:
+                    pass  # Non-critical — don't break the pipeline
 
             # Re-process after skip_frames * 3 for periodic re-verification
             self.track_id_frame_count[track_id] = -3 * self.skip_frames
