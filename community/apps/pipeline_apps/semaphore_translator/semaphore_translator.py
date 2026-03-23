@@ -51,50 +51,54 @@ KEYPOINTS = {
     "right_ankle": 16,
 }
 
-# Semaphore flag alphabet mapping
-# Each letter is defined by the angles of left and right arms
-# Angles are measured clockwise from the person's perspective (viewer sees mirrored):
-#   0 = arm pointing straight down
-#   45 = arm pointing down-left (viewer's perspective: down-right)
-#   90 = arm pointing left (viewer: right)
-#   135 = arm pointing up-left (viewer: up-right)
-#   180 = arm pointing straight up
-#   225 = arm pointing up-right (viewer: up-left)
-#   270 = arm pointing right (viewer: left)
-#   315 = arm pointing down-right (viewer: down-left)
+# Semaphore flag alphabet mapping (International Maritime Standard)
+# Each letter is defined by the angles of the right and left arms.
+# Angles are from the SIGNALER'S perspective, measured clockwise from straight down:
+#   0° = down, 45° = down-right, 90° = right (horizontal), 135° = up-right,
+#   180° = up, 225° = up-left, 270° = left (horizontal), 315° = down-left
+#
+# Note: compute_arm_angle() produces signaler-perspective angles directly
+# because atan2(-dx, dy) on COCO keypoints (person's own left/right) mirrors
+# the image coordinates back to the signaler's frame of reference.
 #
 # Format: (right_arm_angle, left_arm_angle)
 # Angles are discretized to nearest 45-degree increment.
+#
+# References:
+#   https://www.anbg.gov.au/flags/semaphore.html
+#   https://en.wikipedia.org/wiki/Flag_semaphore
 SEMAPHORE_ALPHABET = {
-    (225, 0): "A",
-    (180, 0): "B",
-    (135, 0): "C",
-    (90, 0): "D",
-    (0, 45): "E",
-    (0, 90): "F",
-    (0, 135): "G",
-    (225, 180): "H",  # not standard — placeholder
-    (270, 0): "H",
-    (225, 90): "I",
-    (90, 180): "J",
-    (225, 270): "K",
-    (225, 315): "L",
-    (180, 270): "M",
-    (180, 315): "N",
-    (135, 90): "O",
-    (135, 270): "P",
-    (135, 315): "Q",
-    (90, 270): "R",
-    (90, 315): "S",
-    (270, 315): "T",
-    (225, 135): "U",
-    (180, 135): "V",
-    (90, 135): "W",  # not standard — close approximation
-    (315, 135): "W",
-    (225, 45): "X",  # not standard — close approximation
-    (270, 45): "X",
-    (315, 90): "Y",
-    (315, 45): "Z",
+    # Circle 1 (A-G): one arm at 0° (down)
+    (45, 0): "A",      # right low-right, left down
+    (90, 0): "B",      # right horizontal-right, left down
+    (135, 0): "C",     # right up-right, left down
+    (180, 0): "D",     # right up, left down
+    (0, 225): "E",     # right down, left up-left
+    (0, 270): "F",     # right down, left horizontal-left
+    (0, 315): "G",     # right down, left down-left
+    # Circle 2 (H-N): one arm at 45°
+    (90, 45): "H",     # right horizontal-right, left crosses to low-right
+    (135, 45): "I",    # right up-right, left crosses to low-right
+    (180, 270): "J",   # right up, left horizontal-left (also "letters follow")
+    (45, 180): "K",    # right low-right, left up
+    (45, 225): "L",    # right low-right, left up-left
+    (45, 270): "M",    # right low-right, left horizontal-left
+    (45, 315): "N",    # right low-right, left down-left
+    # Circle 3 (O-S): one arm at 90°
+    (90, 135): "O",    # right horizontal-right, left crosses to up-right
+    (90, 180): "P",    # right horizontal-right, left up
+    (90, 225): "Q",    # right horizontal-right, left up-left
+    (90, 270): "R",    # right horizontal-right, left horizontal-left
+    (90, 315): "S",    # right horizontal-right, left down-left
+    # Circle 4 (T-U): one arm at 135°
+    (135, 180): "T",   # right up-right, left up
+    (135, 225): "U",   # right up-right, left up-left
+    # Remaining letters
+    (180, 315): "V",   # right up, left down-left
+    (225, 270): "W",   # right crosses to up-left, left horizontal-left
+    (225, 315): "X",   # right crosses to up-left, left down-left
+    (135, 270): "Y",   # right up-right, left horizontal-left
+    (315, 270): "Z",   # right crosses to down-left, left horizontal-left
     # Special signals
     (0, 0): "REST",
 }
@@ -139,21 +143,27 @@ def decode_semaphore(right_arm_angle, left_arm_angle):
     """
     Given discretized arm angles, look up the semaphore letter.
     Returns the letter or '?' if no match found.
+    Uses closest match within ANGLE_TOLERANCE for robustness.
     """
     key = (right_arm_angle, left_arm_angle)
     if key in SEMAPHORE_ALPHABET:
         return SEMAPHORE_ALPHABET[key]
 
-    # Try with tolerance by checking nearby angles
+    # Find closest match within tolerance
+    best_letter = "?"
+    best_distance = float("inf")
     for (r_angle, l_angle), letter in SEMAPHORE_ALPHABET.items():
         r_diff = abs(right_arm_angle - r_angle) % 360
         r_diff = min(r_diff, 360 - r_diff)
         l_diff = abs(left_arm_angle - l_angle) % 360
         l_diff = min(l_diff, 360 - l_diff)
         if r_diff <= ANGLE_TOLERANCE and l_diff <= ANGLE_TOLERANCE:
-            return letter
+            distance = r_diff + l_diff
+            if distance < best_distance:
+                best_distance = distance
+                best_letter = letter
 
-    return "?"
+    return best_letter
 
 
 def get_keypoint_pixel_coords(points, keypoint_name, bbox, width, height):
