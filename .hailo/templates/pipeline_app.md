@@ -17,7 +17,7 @@ Pipeline apps are real-time GStreamer video processing applications that run on 
 
 ## File Structure
 
-A pipeline app consists of these files in `hailo-apps-infra/hailo_apps/python/pipeline_apps/<your_app>/`:
+A pipeline app consists of these files in `hailo-apps/hailo_apps/python/pipeline_apps/<your_app>/`:
 
 ```
 your_app/
@@ -27,8 +27,8 @@ your_app/
 ```
 
 Additionally, you may need:
-- An entry in `hailo-apps-infra/hailo_apps/config/resources_config.yaml` for model/resource definitions
-- An entry in `hailo-apps-infra/hailo_apps/config/test_definition_config.yaml` for test integration
+- An entry in `hailo-apps/hailo_apps/config/resources_config.yaml` for model/resource definitions
+- An entry in `hailo-apps/hailo_apps/config/test_definition_config.yaml` for test integration
 - A CLI entry point in `pyproject.toml` under `[project.scripts]`
 
 ## Template: `__init__.py`
@@ -414,7 +414,7 @@ if __name__ == "__main__":
 1. Use `--hef-path <model_name>` to specify a model by name (auto-downloaded from resources_config.yaml)
 2. Use `--hef-path /path/to/model.hef` for a custom local HEF file
 3. Use `--list-models` to see all available models for your app and architecture
-4. To add a new default model, update `hailo-apps-infra/hailo_apps/config/resources_config.yaml`
+4. To add a new default model, update `hailo-apps/hailo_apps/config/resources_config.yaml`
 
 ### How to Change Input/Output
 
@@ -471,7 +471,7 @@ hailo-your-app = "hailo_apps.python.pipeline_apps.your_app.your_app:main"
 - [ ] Called `self.create_pipeline()` at the end of `__init__`
 - [ ] HEF model is registered in `resources_config.yaml` (or you use `--hef-path` directly)
 - [ ] Postprocess `.so` file exists and is compiled (`hailo-compile-postprocess`)
-- [ ] App constants added to `hailo-apps-infra/hailo_apps/python/core/common/defines.py`
+- [ ] App constants added to `hailo-apps/hailo_apps/python/core/common/defines.py`
 - [ ] Callback is non-blocking
 - [ ] Tested with `--input usb` (camera) and a video file
 - [ ] (Optional) CLI entry point added to `pyproject.toml`

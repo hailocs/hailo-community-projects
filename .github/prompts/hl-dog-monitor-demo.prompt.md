@@ -41,10 +41,10 @@ Read ALL of these files and return a condensed context brief:
   7. .hailo/skills/hl-monitoring.md (monitoring skill)
   8. .hailo/skills/hl-event-detection.md (event parsing skill)
   9. .hailo/toolsets/vlm-backend-api.md (Backend class API)
-  10. hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py (FULL source - reference app)
-  11. hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py (FULL source - reused module)
-  12. hailo-apps-infra/hailo_apps/python/core/common/defines.py (existing app constants)
-  13. hailo-apps-infra/hailo_apps/python/core/common/parser.py (CLI parser)
+  10. hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py (FULL source - reference app)
+  11. hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py (FULL source - reused module)
+  12. hailo-apps/hailo_apps/python/core/common/defines.py (existing app constants)
+  13. hailo-apps/hailo_apps/python/core/common/parser.py (CLI parser)
   14. .hailo/instructions/orchestration.md (orchestration framework)
   15. .hailo/instructions/agent-protocols.md (agent behavior rules)
 
@@ -77,7 +77,7 @@ Phase 4 GATE: Final validation
 
 ### PHASE 1: Planning & Registration
 
-**Register the app constant** — add to `hailo-apps-infra/hailo_apps/python/core/common/defines.py`:
+**Register the app constant** — add to `hailo-apps/hailo_apps/python/core/common/defines.py`:
 ```python
 DOG_MONITOR_ORCH_APP = "dog_monitor_orch"
 ```
@@ -93,7 +93,7 @@ community/apps/gen_ai_apps/dog_monitor_orch/
 
 **PHASE 1 GATE** — run these commands and verify they pass:
 ```bash
-grep "DOG_MONITOR_ORCH_APP" hailo-apps-infra/hailo_apps/python/core/common/defines.py
+grep "DOG_MONITOR_ORCH_APP" hailo-apps/hailo_apps/python/core/common/defines.py
 ls community/apps/gen_ai_apps/dog_monitor_orch/__init__.py
 ```
 If either fails -> fix before proceeding.

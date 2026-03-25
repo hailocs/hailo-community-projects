@@ -150,7 +150,7 @@ resources/*.hef
 resources/*.so
 
 # Submodule internals (tracked by git submodule)
-# hailo-apps-infra/ is a submodule — don't ignore it
+# hailo-apps/ is a submodule — don't ignore it
 
 # Logs and temp files
 *.tmp

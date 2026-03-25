@@ -5,7 +5,7 @@
 
 The central hub for Hailo community development — community-contributed AI applications and **agentic AI development tooling** for Hailo edge accelerators.
 
-Built on top of [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) (included as a git submodule), this repo provides 20+ ready-to-run community apps, a growing knowledge base of real-world optimizations, and an AI-powered development framework that lets you build production-ready Hailo apps through natural language.
+Built on top of [hailo-apps](https://github.com/hailo-ai/hailo-apps) (included as a git submodule), this repo provides 20+ ready-to-run community apps, a growing knowledge base of real-world optimizations, and an AI-powered development framework that lets you build production-ready Hailo apps through natural language.
 
 Supports **Hailo-8** (26 TOPS), **Hailo-8L** (13 TOPS), and **Hailo-10H** (GenAI: LLM, VLM, Whisper + vision pipelines).
 
@@ -15,7 +15,7 @@ Visit the [Hailo Official Website](https://hailo.ai/) and [Hailo Community Forum
 
 ```
 hailo-community-projects/
-├── hailo-apps-infra/              # Git submodule — core framework & official apps
+├── hailo-apps/              # Git submodule — core framework & official apps
 ├── community/
 │   ├── apps/
 │   │   ├── pipeline_apps/         # 14 GStreamer real-time video community apps
@@ -24,11 +24,11 @@ hailo-community-projects/
 │   └── contributions/             # Community-shared optimization insights
 ├── community_projects/            # Legacy community projects (games, robots, etc.)
 ├── .hailo/                        # Shared agentic knowledge (cross-platform)
-├── install.sh                     # Thin wrapper → hailo-apps-infra/install.sh
+├── install.sh                     # Thin wrapper → hailo-apps/install.sh
 └── setup_env.sh                   # Activates venv and sets PYTHONPATH
 ```
 
-See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps-infra) for the full development guide and API reference.
+See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps) for the full development guide and API reference.
 
 ## Hardware Setup
 
@@ -48,20 +48,20 @@ git submodule update --init --recursive
 ```
 
 ### Run the Installer
-The install script initializes the hailo-apps-infra submodule, runs its installer, creates a virtual environment symlink, and installs community-specific dependencies:
+The install script initializes the hailo-apps submodule, runs its installer, creates a virtual environment symlink, and installs community-specific dependencies:
 ```bash
 ./install.sh
 ```
 
 ### Set Up the Environment
-When opening a new terminal session, source the environment setup script. This activates the `venv_hailo_apps` virtual environment and sets `PYTHONPATH` for both the project root and hailo-apps-infra:
+When opening a new terminal session, source the environment setup script. This activates the `venv_hailo_apps` virtual environment and sets `PYTHONPATH` for both the project root and hailo-apps:
 ```bash
 source setup_env.sh
 ```
 
 ## Official Pipeline Apps
 
-The official apps (detection, pose estimation, segmentation, depth, etc.) are provided by the [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) submodule. Run them via CLI commands after sourcing the environment:
+The official apps (detection, pose estimation, segmentation, depth, etc.) are provided by the [hailo-apps](https://github.com/hailo-ai/hailo-apps) submodule. Run them via CLI commands after sourcing the environment:
 
 ```bash
 source setup_env.sh
@@ -81,7 +81,7 @@ hailo-depth --input usb
 
 For all options: `hailo-detect --help`
 
-See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps-infra) for the full list of official apps and their usage.
+See the [Hailo Apps Infra documentation](https://github.com/hailo-ai/hailo-apps) for the full list of official apps and their usage.
 
 ## Community Apps
 
@@ -191,7 +191,7 @@ Visit the [HailoRT Python API documentation](https://hailo.ai/developer-zone/doc
 
 ### Hailo Dataflow Compiler (DFC)
 The DFC compiles neural networks to run on Hailo-8/8L processors. Download from the [Hailo Developer Zone](https://hailo.ai/developer-zone/software-downloads/).
-For training and deployment, see the [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) and the [Retraining Example](https://github.com/hailo-ai/hailo-apps-infra/blob/main/doc/developer_guide/retraining_example.md).
+For training and deployment, see the [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) and the [Retraining Example](https://github.com/hailo-ai/hailo-apps/blob/main/doc/developer_guide/retraining_example.md).
 
 ## Contributing
 

@@ -39,7 +39,7 @@ To distinguish an app path from a trace dir: check if the path ends in `.py` (ap
 List available apps from all locations:
 ```bash
 echo "=== Official pipeline apps ==="
-ls hailo-apps-infra/hailo_apps/python/pipeline_apps/
+ls hailo-apps/hailo_apps/python/pipeline_apps/
 echo "=== Community pipeline apps ==="
 ls community/apps/pipeline_apps/
 echo "=== Community standalone apps ==="
@@ -52,7 +52,7 @@ Then ask a **focused question** to narrow down:
 
 > "What are you working on? I can see pipeline apps in both the official framework and community directories.
 >
-> **Official apps** (in `hailo-apps-infra/`):
+> **Official apps** (in `hailo-apps/`):
 > - **detection** / **detection_simple** — object detection
 > - **pose_estimation** — body pose tracking
 > - **gesture_detection** — hand gesture recognition
@@ -142,7 +142,7 @@ python .claude/skills/hl-profile/scripts/setup_check.py --json
 cd ~/gst-shark && ./autogen.sh --prefix=/usr/ --libdir=<detected_libdir> && make && sudo make install
 ```
 
-Verify: `gst-inspect-1.0 sharktracers`. On failure, point to `hailo-apps-infra/doc/developer_guide/debugging_with_gst_shark.md`.
+Verify: `gst-inspect-1.0 sharktracers`. On failure, point to `hailo-apps/doc/developer_guide/debugging_with_gst_shark.md`.
 
 ## Phase 3: Profile
 
@@ -533,8 +533,8 @@ Before suggesting code changes, **always read the actual pipeline code** to unde
 - Current queue sizes and configurations
 
 Use `Read` and `Grep` to inspect:
-- `hailo-apps-infra/hailo_apps/python/pipeline_apps/<app>/app_pipeline.py` — the pipeline definition
-- `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` — helper functions
+- `hailo-apps/hailo_apps/python/pipeline_apps/<app>/app_pipeline.py` — the pipeline definition
+- `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` — helper functions
 
 ### Use knowledge base proactively
 
@@ -571,11 +571,11 @@ All at `.claude/skills/hl-profile/scripts/`:
 
 ## Project Context
 
-- Pipeline helpers: `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py`
+- Pipeline helpers: `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py`
   - `QUEUE()`: `max_size_buffers=3, max_size_bytes=0, max_size_time=0, leaky="no"`
   - `INFERENCE_PIPELINE_WRAPPER()`: `bypass_max_size_buffers=20`
-- GStreamerApp base: `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_app.py`
+- GStreamerApp base: `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_app.py`
   - `pipeline_latency=300ms`
-- Apps: `hailo-apps-infra/hailo_apps/python/pipeline_apps/<app_name>/`
-- Run apps: `python hailo-apps-infra/hailo_apps/python/pipeline_apps/<app>/app.py [--input ...]`
-- GST-Shark docs: `hailo-apps-infra/doc/developer_guide/debugging_with_gst_shark.md`
+- Apps: `hailo-apps/hailo_apps/python/pipeline_apps/<app_name>/`
+- Run apps: `python hailo-apps/hailo_apps/python/pipeline_apps/<app>/app.py [--input ...]`
+- GST-Shark docs: `hailo-apps/doc/developer_guide/debugging_with_gst_shark.md`

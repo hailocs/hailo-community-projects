@@ -1,6 +1,6 @@
 # Hailo Community Projects — Copilot Instructions
 
-Community-contributed AI applications for Hailo edge accelerators, built on [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) (git submodule).
+Community-contributed AI applications for Hailo edge accelerators, built on [hailo-apps](https://github.com/hailo-ai/hailo-apps) (git submodule).
 
 ## Quick Start
 - Read `.hailo/README.md` for the master index of all shared knowledge
@@ -11,7 +11,7 @@ All skills, instructions, toolsets, knowledge bases, templates, and examples liv
 See `.hailo/README.md` for the complete index.
 
 ## Two-Repo Layout
-- `hailo-apps-infra/` — Git submodule (core framework, READ-ONLY)
+- `hailo-apps/` — Git submodule (core framework, READ-ONLY)
 - `community/apps/` — Community apps (WRITE here)
 - Python imports: `from hailo_apps.python.core...` (via PYTHONPATH)
 

@@ -1,7 +1,7 @@
 # ============================================================================
 # APP CATALOG - Structured catalog of all Hailo apps (26 total)
 # ============================================================================
-# Generated from source code analysis of the hailo-apps-infra repository.
+# Generated from source code analysis of the hailo-apps repository.
 # Each app includes models, pipeline patterns, features, and metadata.
 
 # ============================================================================
@@ -36,8 +36,8 @@ detection:
     - "Adding custom post-processing logic"
     - "Learning the pipeline app pattern"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/detection/detection.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/detection/detection_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/detection/detection.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/detection/detection_pipeline.py
   cli_command: "hailo-detect"
   related_apps: [detection_simple, tiling, multisource]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_UNIQUE_ID]
@@ -68,8 +68,8 @@ detection_simple:
     - "Simplest possible detection pipeline"
     - "Low-latency detection without tracking"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/detection_simple/detection_simple.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/detection_simple/detection_simple_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/detection_simple/detection_simple.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/detection_simple/detection_simple_pipeline.py
   cli_command: "hailo-detect-simple"
   related_apps: [detection]
   callback_receives: [hailo.HAILO_DETECTION]
@@ -101,8 +101,8 @@ pose_estimation:
     - "Any pose/keypoint estimation task"
     - "Building gesture-based interactions"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/pose_estimation/pose_estimation.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/pose_estimation/pose_estimation_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/pose_estimation/pose_estimation.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/pose_estimation/pose_estimation_pipeline.py
   cli_command: "hailo-pose"
   related_apps: [detection]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_LANDMARKS, hailo.HAILO_UNIQUE_ID]
@@ -133,8 +133,8 @@ instance_segmentation:
     - "Any pixel-level segmentation task"
     - "Object masking applications"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/instance_segmentation/instance_segmentation.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/instance_segmentation/instance_segmentation_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/instance_segmentation/instance_segmentation.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/instance_segmentation/instance_segmentation_pipeline.py
   cli_command: "hailo-seg"
   related_apps: [detection]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_CONF_CLASS_MASK, hailo.HAILO_UNIQUE_ID]
@@ -172,9 +172,9 @@ face_recognition:
     - "Cascaded multi-model pipelines with cropper"
     - "Vector database integration"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/face_recognition/face_recognition.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/face_recognition/face_recognition_pipeline.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/face_recognition/face_recon_algo_params.json
+    - hailo-apps/hailo_apps/python/pipeline_apps/face_recognition/face_recognition.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/face_recognition/face_recognition_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/face_recognition/face_recon_algo_params.json
   cli_command: "hailo-face-recon"
   related_apps: [reid_multisource]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_UNIQUE_ID, hailo.HAILO_MATRIX, hailo.HAILO_CLASSIFICATION]
@@ -205,8 +205,8 @@ depth:
     - "Depth estimation tasks"
     - "Simplest inference wrapper pipeline (no tracker)"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/depth/depth.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/depth/depth_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/depth/depth.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/depth/depth_pipeline.py
   cli_command: "hailo-depth"
   related_apps: []
   callback_receives: [hailo.HAILO_DEPTH_MASK]
@@ -248,10 +248,10 @@ clip:
     - "Text-based object search"
     - "Zero-shot classification without model retraining"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/clip/clip.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/clip/clip_pipeline.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/clip/text_image_matcher.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/clip/gui.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/clip/clip.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/clip/clip_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/clip/text_image_matcher.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/clip/gui.py
   cli_command: "hailo-clip"
   related_apps: [detection]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_MATRIX, hailo.HAILO_CLASSIFICATION, hailo.HAILO_UNIQUE_ID]
@@ -282,10 +282,10 @@ tiling:
     - "Detecting small objects in high-resolution input"
     - "Tiled inference pipelines"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/tiling/tiling.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/tiling/tiling_pipeline.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/tiling/configuration.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/tiling/tile_calculator.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/tiling/tiling.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/tiling/tiling_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/tiling/configuration.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/tiling/tile_calculator.py
   cli_command: "hailo-tiling"
   related_apps: [detection]
   callback_receives: [hailo.HAILO_DETECTION]
@@ -315,8 +315,8 @@ multisource:
     - "Multi-camera detection systems"
     - "Multiplexing multiple video streams through one accelerator"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/multisource/multisource.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/multisource/multisource_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/multisource/multisource.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/multisource/multisource_pipeline.py
   cli_command: "hailo-multisource"
   related_apps: [reid_multisource, detection]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_UNIQUE_ID]
@@ -352,8 +352,8 @@ reid_multisource:
     - "Cross-camera re-identification"
     - "Most complex pipeline combining multi-source with cascaded models"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/reid_multisource/reid_multisource.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/reid_multisource/reid_multisource_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/reid_multisource/reid_multisource.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/reid_multisource/reid_multisource_pipeline.py
   cli_command: "hailo-reid"
   related_apps: [face_recognition, multisource]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_UNIQUE_ID, hailo.HAILO_MATRIX, hailo.HAILO_CLASSIFICATION]
@@ -390,8 +390,8 @@ paddle_ocr:
     - "OCR/text recognition in video"
     - "Cascaded detection + recognition pipelines"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/paddle_ocr/paddle_ocr.py
-    - hailo-apps-infra/hailo_apps/python/pipeline_apps/paddle_ocr/paddle_ocr_pipeline.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/paddle_ocr/paddle_ocr.py
+    - hailo-apps/hailo_apps/python/pipeline_apps/paddle_ocr/paddle_ocr_pipeline.py
   cli_command: "hailo-ocr"
   related_apps: [face_recognition]
   callback_receives: [hailo.HAILO_DETECTION, hailo.HAILO_UNIQUE_ID, hailo.HAILO_CLASSIFICATION]
@@ -424,8 +424,8 @@ object_detection_standalone:
     - "Understanding HailoRT inference directly"
     - "Batch processing of images/videos"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/object_detection/object_detection.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/object_detection/object_detection_post_process.py
+    - hailo-apps/hailo_apps/python/standalone_apps/object_detection/object_detection.py
+    - hailo-apps/hailo_apps/python/standalone_apps/object_detection/object_detection_post_process.py
   cli_command: null
   related_apps: [detection]
   callback_receives: null
@@ -452,8 +452,8 @@ instance_segmentation_standalone:
   good_starting_point_for:
     - "Standalone segmentation without GStreamer"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/instance_segmentation/instance_segmentation.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/instance_segmentation/post_process/postprocessing.py
+    - hailo-apps/hailo_apps/python/standalone_apps/instance_segmentation/instance_segmentation.py
+    - hailo-apps/hailo_apps/python/standalone_apps/instance_segmentation/post_process/postprocessing.py
   cli_command: null
   related_apps: [instance_segmentation]
   callback_receives: null
@@ -480,8 +480,8 @@ pose_estimation_standalone:
   good_starting_point_for:
     - "Standalone pose estimation"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/pose_estimation/pose_estimation.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/pose_estimation/pose_estimation_utils.py
+    - hailo-apps/hailo_apps/python/standalone_apps/pose_estimation/pose_estimation.py
+    - hailo-apps/hailo_apps/python/standalone_apps/pose_estimation/pose_estimation_utils.py
   cli_command: null
   related_apps: [pose_estimation]
   callback_receives: null
@@ -509,8 +509,8 @@ lane_detection_standalone:
   good_starting_point_for:
     - "Lane detection and road marking tasks"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/lane_detection/lane_detection.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/lane_detection/lane_detection_utils.py
+    - hailo-apps/hailo_apps/python/standalone_apps/lane_detection/lane_detection.py
+    - hailo-apps/hailo_apps/python/standalone_apps/lane_detection/lane_detection_utils.py
   cli_command: null
   related_apps: []
   callback_receives: null
@@ -538,8 +538,8 @@ super_resolution_standalone:
   good_starting_point_for:
     - "Image enhancement tasks"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/super_resolution/super_resolution.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/super_resolution/super_resolution_utils.py
+    - hailo-apps/hailo_apps/python/standalone_apps/super_resolution/super_resolution.py
+    - hailo-apps/hailo_apps/python/standalone_apps/super_resolution/super_resolution_utils.py
   cli_command: null
   related_apps: []
   callback_receives: null
@@ -567,8 +567,8 @@ oriented_object_detection_standalone:
   good_starting_point_for:
     - "Oriented bounding box detection"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/oriented_object_detection/oriented_object_detection.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/oriented_object_detection/oriented_object_detection_post_process.py
+    - hailo-apps/hailo_apps/python/standalone_apps/oriented_object_detection/oriented_object_detection.py
+    - hailo-apps/hailo_apps/python/standalone_apps/oriented_object_detection/oriented_object_detection_post_process.py
   cli_command: null
   related_apps: []
   callback_receives: null
@@ -600,9 +600,9 @@ paddle_ocr_standalone:
   good_starting_point_for:
     - "Standalone OCR without GStreamer"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/paddle_ocr/paddle_ocr.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/paddle_ocr/paddle_ocr_utils.py
-    - hailo-apps-infra/hailo_apps/python/standalone_apps/paddle_ocr/db_postprocess.py
+    - hailo-apps/hailo_apps/python/standalone_apps/paddle_ocr/paddle_ocr.py
+    - hailo-apps/hailo_apps/python/standalone_apps/paddle_ocr/paddle_ocr_utils.py
+    - hailo-apps/hailo_apps/python/standalone_apps/paddle_ocr/db_postprocess.py
   cli_command: null
   related_apps: [paddle_ocr]
   callback_receives: null
@@ -640,10 +640,10 @@ voice_assistant:
     - "Building voice AI applications"
     - "Combining speech and language models"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/voice_assistant/voice_assistant.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/interaction.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/speech_to_text.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/text_to_speech.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/voice_assistant/voice_assistant.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/interaction.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/speech_to_text.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/gen_ai_utils/voice_processing/text_to_speech.py
   cli_command: null
   related_apps: [simple_whisper_chat, simple_llm_chat, agent_tools_example]
   callback_receives: null
@@ -672,8 +672,8 @@ vlm_chat:
     - "Vision-language applications"
     - "Image understanding with natural language"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py
   cli_command: null
   related_apps: [simple_vlm_chat]
   callback_receives: null
@@ -703,10 +703,10 @@ agent_tools_example:
     - "Building AI agents with tool calling"
     - "IoT control via natural language"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/agent.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/config.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/yaml_config.py
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/base.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/agent.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/config.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/yaml_config.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/base.py
   cli_command: null
   related_apps: [voice_assistant]
   callback_receives: null
@@ -735,7 +735,7 @@ simple_llm_chat:
     - "First GenAI app on Hailo-10H"
     - "Understanding the LLM API"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/simple_llm_chat/simple_llm_chat.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/simple_llm_chat/simple_llm_chat.py
   cli_command: null
   related_apps: [voice_assistant, agent_tools_example]
   callback_receives: null
@@ -763,7 +763,7 @@ simple_vlm_chat:
     - "Understanding the VLM API"
     - "Image-based question answering"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/simple_vlm_chat/simple_vlm_chat.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/simple_vlm_chat/simple_vlm_chat.py
   cli_command: null
   related_apps: [vlm_chat]
   callback_receives: null
@@ -790,7 +790,7 @@ simple_whisper_chat:
   good_starting_point_for:
     - "Understanding the Whisper/Speech2Text API"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/simple_whisper_chat/simple_whisper_chat.py
+    - hailo-apps/hailo_apps/python/gen_ai_apps/simple_whisper_chat/simple_whisper_chat.py
   cli_command: null
   related_apps: [voice_assistant]
   callback_receives: null
@@ -819,7 +819,7 @@ hailo_ollama:
     - "Using Hailo with Ollama ecosystem"
     - "Web-based LLM interfaces"
   key_files:
-    - hailo-apps-infra/hailo_apps/python/gen_ai_apps/hailo_ollama/README.md
+    - hailo-apps/hailo_apps/python/gen_ai_apps/hailo_ollama/README.md
   cli_command: null
   related_apps: [simple_llm_chat]
   callback_receives: null

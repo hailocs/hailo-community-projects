@@ -1,6 +1,6 @@
 # Skill: Plan-and-Execute Loop
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Execute complex tasks through a disciplined loop of planning, delegating, implementing, and gating — the core agentic workflow pattern for this repository.
 
@@ -175,7 +175,7 @@ Run these commands at each phase boundary:
 
 ```bash
 # Phase 1 Gate: Structure exists
-ls -la hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/
+ls -la hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/
 # Expect: __init__.py and any stub files
 
 # Phase 2 Gate: Code is importable
@@ -190,7 +190,7 @@ python -m hailo_apps.python.gen_ai_apps.<app_name>.<main_module> --help
 # Expect: Help text with all expected arguments
 
 # Phase 4 Gate: Everything is documented
-test -f hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/README.md && echo "README OK"
+test -f hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/README.md && echo "README OK"
 ```
 
 ### Gate Failure Recovery

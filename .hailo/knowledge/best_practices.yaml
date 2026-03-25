@@ -44,6 +44,31 @@ practices:
     applies_to: [pipeline]
     source: "code_snippets.yaml:hybrid_overlay_plus_userframe"
 
+  - title: "User-frame color space: always convert RGB→BGR before set_frame"
+    situation: "Pipeline app using --use-frame with custom frame rendering"
+    insight: |
+      GStreamer buffers are RGB. OpenCV cv2.imshow (used by display_user_data_frame)
+      expects BGR. Always convert before calling set_frame():
+        frame = get_numpy_from_buffer(buffer, fmt, width, height)  # RGB
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        # ... draw on frame_bgr with cv2 ...
+        user_data.set_frame(frame_bgr)
+      cv2.applyColorMap already produces BGR, so colormap output can go directly
+      to set_frame without conversion. Only raw GStreamer frames need RGB→BGR.
+    applies_to: [pipeline]
+    source: "depth_anything app, hotdog_not_hotdog, code_snippets.yaml:480"
+
+  - title: "Do not set use_frame in callback class — it gets overridden"
+    situation: "Callback class __init__ sets self.use_frame = True"
+    insight: |
+      GStreamerApp.__init__ always overwrites user_data.use_frame with the
+      CLI --use-frame flag value (gstreamer_app.py line 342). Setting
+      self.use_frame = True in the callback class __init__ is dead code.
+      Users must pass --use-frame on the command line. If your app always
+      needs frame access, document --use-frame as required in the README.
+    applies_to: [pipeline]
+    source: "depth_anything debugging, gstreamer_app.py line 342"
+
   # --------------------------------------------------------------------------
   # Display Method Selection
   # --------------------------------------------------------------------------

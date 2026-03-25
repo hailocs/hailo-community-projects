@@ -11,7 +11,7 @@ All skills, instructions, toolsets, knowledge bases, templates, and examples liv
 See `.hailo/README.md` for the complete directory listing.
 
 ## Two-Repo Layout
-- `hailo-apps-infra/` — Git submodule with the core framework (READ-ONLY)
+- `hailo-apps/` — Git submodule with the core framework (READ-ONLY)
 - `community/apps/` — Where new apps go (WRITE here)
 - Python imports use `from hailo_apps.python.core...` (via PYTHONPATH)
 

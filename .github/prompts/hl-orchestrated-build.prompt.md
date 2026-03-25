@@ -56,7 +56,7 @@ Launch a sub-agent to load ALL relevant context before writing any code:
   REFERENCE CODE (read full source):
     - <reference_app_main_file>
     - <reference_app_supporting_files>
-    - hailo-apps-infra/hailo_apps/python/core/common/defines.py
+    - hailo-apps/hailo_apps/python/core/common/defines.py
 
   ORCHESTRATION:
     - .hailo/instructions/orchestration.md
@@ -79,7 +79,7 @@ After receiving the brief, create a todo list with ALL phases.
 4. Create stub files for all modules (empty or with signatures only)
 
 PHASE 1 GATE:
-  grep "<APP_CONSTANT>" hailo-apps-infra/hailo_apps/python/core/common/defines.py
+  grep "<APP_CONSTANT>" hailo-apps/hailo_apps/python/core/common/defines.py
   ls community/apps/<app_category>/<app_name>/__init__.py
 
 ### PHASE 2: Core Implementation
@@ -139,7 +139,7 @@ Mark all todos complete. Report deliverables.
 | `<primary_skill>` | hl-build-vlm-app |
 | `<secondary_skill>` | hl-monitoring |
 | `<relevant_api>` | vlm-backend-api |
-| `<reference_app_main_file>` | hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py |
+| `<reference_app_main_file>` | hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py |
 
 ### Pipeline Detection App
 
@@ -152,7 +152,7 @@ Mark all todos complete. Report deliverables.
 | `<primary_skill>` | hl-build-app |
 | `<secondary_skill>` | hl-event-detection |
 | `<relevant_api>` | gstreamer-elements |
-| `<reference_app_main_file>` | hailo-apps-infra/hailo_apps/python/pipeline_apps/detection/detection_app.py |
+| `<reference_app_main_file>` | hailo-apps/hailo_apps/python/pipeline_apps/detection/detection_app.py |
 
 ### Standalone Inference App
 
@@ -165,7 +165,7 @@ Mark all todos complete. Report deliverables.
 | `<primary_skill>` | hl-build-standalone-app |
 | `<secondary_skill>` | hl-camera |
 | `<relevant_api>` | core-framework-api |
-| `<reference_app_main_file>` | hailo-apps-infra/hailo_apps/python/standalone_apps/face_recognition/face_recon.py |
+| `<reference_app_main_file>` | hailo-apps/hailo_apps/python/standalone_apps/face_recognition/face_recon.py |
 
 ### Agent with Tool Calling
 
@@ -178,7 +178,7 @@ Mark all todos complete. Report deliverables.
 | `<primary_skill>` | hl-build-agent-app |
 | `<secondary_skill>` | hl-add-voice |
 | `<relevant_api>` | gen-ai-utilities |
-| `<reference_app_main_file>` | hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/agent.py |
+| `<reference_app_main_file>` | hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/agent.py |
 
 ---
 

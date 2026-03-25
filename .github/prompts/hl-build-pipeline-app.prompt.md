@@ -11,8 +11,8 @@ You are building a new GStreamer pipeline application in the hailo-apps reposito
 2. `.hailo/skills/hl-build-app.md` — Pipeline app skill
 3. `.hailo/toolsets/gstreamer-elements.md` — Available elements
 4. `.hailo/toolsets/core-framework-api.md` — Framework API
-5. `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_app.py` — Base class
-6. `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` — Helpers
+5. `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_app.py` — Base class
+6. `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` — Helpers
 
 ### Build Steps
 1. Register app in `defines.py` (name, model, postprocess .so)

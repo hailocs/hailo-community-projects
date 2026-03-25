@@ -109,7 +109,7 @@ for det in detections:
 
 ## Dependencies
 
-- hailo-apps-infra (core framework, via PYTHONPATH)
+- hailo-apps (core framework, via PYTHONPATH)
 - HailoRT (Hailo device runtime)
 - TAPPAS GStreamer plugins (hailonet, hailofilter, hailooverlay, etc.)
 - OpenCV (cv2) — for frame drawing with --use-frame
@@ -134,7 +134,7 @@ python community/apps/{{type}}_apps/{{name}}/{{name}}.py --input <test_video> --
 
 ## Related Apps
 
-- **Template base:** `hailo-apps-infra/hailo_apps/python/{{type}}_apps/{{template_app}}/`
+- **Template base:** `hailo-apps/hailo_apps/python/{{type}}_apps/{{template_app}}/`
 - **Similar community apps:** {{list related community apps}}
 - **Alternative approaches:** {{describe when to use alternative apps}}
 ```

@@ -1,6 +1,6 @@
 # Skill: Create VLM Application
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Build a Vision-Language Model application that uses the Hailo-10H VLM for image understanding.
 
@@ -18,7 +18,7 @@
 
 ## Reference Implementation
 
-Study `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/` before building:
+Study `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/` before building:
 - `vlm_chat.py` — State machine app with camera loop
 - `backend.py` — Multiprocessing VLM inference backend
 
@@ -26,7 +26,7 @@ Study `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/` before building
 
 ### Step 1: Register App Constants
 
-Add to `hailo-apps-infra/hailo_apps/python/core/common/defines.py`:
+Add to `hailo-apps/hailo_apps/python/core/common/defines.py`:
 ```python
 MY_VLM_APP = "my_vlm_app"
 MY_VLM_APP_TITLE = "My VLM App"

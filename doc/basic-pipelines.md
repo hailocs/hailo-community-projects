@@ -1,13 +1,13 @@
 # Hailo Pipeline Development Guide
 
-This guide covers how to develop custom applications using the GStreamer pipeline framework provided by [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra). The examples demonstrate object detection, human pose estimation, instance segmentation, and depth estimation using Hailo-8 and Hailo-8L accelerators.
+This guide covers how to develop custom applications using the GStreamer pipeline framework provided by [hailo-apps](https://github.com/hailo-ai/hailo-apps). The examples demonstrate object detection, human pose estimation, instance segmentation, and depth estimation using Hailo-8 and Hailo-8L accelerators.
 
 ## Installation
 See the [Installation Guide](../README.md#installation) in the main README for detailed instructions on setting up your environment.
 
 ## Overview
 
-The official pipeline apps are provided by the `hailo-apps-infra` submodule. Community apps follow the same patterns and live in `community/apps/pipeline_apps/`.
+The official pipeline apps are provided by the `hailo-apps` submodule. Community apps follow the same patterns and live in `community/apps/pipeline_apps/`.
 
 ```bash
 source setup_env.sh
@@ -70,7 +70,7 @@ hailo-detect --input usb --use-frame    # Enable Python overlay drawing
 hailo-detect --help                      # See all options
 ```
 
-Additional models available via `hailo-download-resources --all`. For retraining, see the [Retraining Example](https://github.com/hailo-ai/hailo-apps-infra/blob/main/doc/developer_guide/retraining_example.md).
+Additional models available via `hailo-download-resources --all`. For retraining, see the [Retraining Example](https://github.com/hailo-ai/hailo-apps/blob/main/doc/developer_guide/retraining_example.md).
 
 ### Pose Estimation
 Human pose estimation using YOLOv8 pose models. Each person has 17 keypoints (nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles).
@@ -109,13 +109,13 @@ The agent will scaffold your app in `community/apps/pipeline_apps/`, read framew
 
 ### Manually
 
-1. Start with an existing app as a template (see `hailo-apps-infra/hailo_apps/python/pipeline_apps/`)
+1. Start with an existing app as a template (see `hailo-apps/hailo_apps/python/pipeline_apps/`)
 2. Create your app directory in `community/apps/pipeline_apps/<your_app>/`
 3. Subclass `GStreamerApp` and override `get_pipeline_string()`
 4. Write your callback function
 5. Add a `README.md`
 
-See the [hailo-apps-infra Developer Guide](https://github.com/hailo-ai/hailo-apps-infra/blob/main/doc/developer_guide/app_development.md) for the full development guide.
+See the [hailo-apps Developer Guide](https://github.com/hailo-ai/hailo-apps/blob/main/doc/developer_guide/app_development.md) for the full development guide.
 
 ## Development Recommendations
 
@@ -161,7 +161,7 @@ python your_app.py --input usb
 ```
 
 ### Pipeline Debugging
-See the [hailo-apps-infra Developer Guide](https://github.com/hailo-ai/hailo-apps-infra/blob/main/doc/developer_guide/app_development.md) for GStreamer pipeline debugging techniques, including GST-Shark tracing (also available via `/hl-profile`).
+See the [hailo-apps Developer Guide](https://github.com/hailo-ai/hailo-apps/blob/main/doc/developer_guide/app_development.md) for GStreamer pipeline debugging techniques, including GST-Shark tracing (also available via `/hl-profile`).
 
 ## Environment Setup
 
@@ -170,4 +170,4 @@ Each new terminal session requires:
 source setup_env.sh
 ```
 
-This activates the virtual environment and sets `PYTHONPATH` for both the project root and hailo-apps-infra.
+This activates the virtual environment and sets `PYTHONPATH` for both the project root and hailo-apps.

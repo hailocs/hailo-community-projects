@@ -1,4 +1,10 @@
 # Hailo Community Projects Configuration
-# All other settings are managed by hailo-apps-infra's own config system.
+# All other settings are managed by hailo-apps's own config system.
 
-hailo_apps_infra_branch_tag: "main"
+hailo_apps:
+  url: "https://github.com/hailo-ai/hailo-apps.git"
+  branch: "main"
+  dir_name: "hailo-apps"
+  # Development (internal):
+  # url: "https://github.com/hailocs/hailo-apps-internal.git"
+  # branch: "dev"

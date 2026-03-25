@@ -1,6 +1,6 @@
 # Community Apps
 
-Example applications built with the `/hl-build-app` skill and community contributors. These live separately from the core framework (`hailo-apps-infra/hailo_apps/`) to ease maintenance and merging.
+Example applications built with the `/hl-build-app` skill and community contributors. These live separately from the core framework (`hailo-apps/hailo_apps/`) to ease maintenance and merging.
 
 ## Structure
 

@@ -89,7 +89,7 @@ Search all text fields for:
 
 ### Safe patterns (do NOT redact)
 
-- Repo-relative paths: `hailo-apps-infra/hailo_apps/python/...`, `.claude/...`, `community/...`
+- Repo-relative paths: `hailo-apps/hailo_apps/python/...`, `.claude/...`, `community/...`
 - GStreamer element names and properties
 - Performance metrics and numbers
 - Hardware identifiers: `hailo8`, `hailo8l`, `hailo10h`

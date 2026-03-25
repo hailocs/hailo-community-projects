@@ -1,6 +1,6 @@
 # Skill: Add Voice Mode to Application
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Add speech-to-text input and text-to-speech output to any Hailo app.
 

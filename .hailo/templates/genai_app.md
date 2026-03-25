@@ -18,7 +18,7 @@ GenAI apps run on Hailo-10H hardware and use the `hailo_platform.genai` SDK for 
 
 ## File Structure
 
-GenAI apps live in `hailo-apps-infra/hailo_apps/python/gen_ai_apps/<your_app>/`:
+GenAI apps live in `hailo-apps/hailo_apps/python/gen_ai_apps/<your_app>/`:
 
 ```
 your_app/
@@ -26,7 +26,7 @@ your_app/
   your_app.py          # Main script
 ```
 
-For complex apps, shared utilities are in `hailo-apps-infra/hailo_apps/python/gen_ai_apps/gen_ai_utils/`:
+For complex apps, shared utilities are in `hailo-apps/hailo_apps/python/gen_ai_apps/gen_ai_utils/`:
 ```
 gen_ai_utils/
   llm_utils/           # Context management, streaming, tool handling, terminal UI
@@ -389,7 +389,7 @@ if __name__ == "__main__":
 
 ## Pattern 4: Voice Assistant (Complex App Outline)
 
-For full voice assistants combining STT + LLM + TTS. This is an outline showing the architecture -- refer to `hailo-apps-infra/hailo_apps/python/gen_ai_apps/voice_assistant/voice_assistant.py` for the complete implementation.
+For full voice assistants combining STT + LLM + TTS. This is an outline showing the architecture -- refer to `hailo-apps/hailo_apps/python/gen_ai_apps/voice_assistant/voice_assistant.py` for the complete implementation.
 
 ### Architecture
 
@@ -486,7 +486,7 @@ prompt = [
 
 ### How to Add Tool Calling / Function Calling
 
-See `hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/` for the full pattern. Key utilities:
+See `hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/` for the full pattern. Key utilities:
 - `gen_ai_utils/llm_utils/tool_discovery.py` -- Auto-discover callable Python functions
 - `gen_ai_utils/llm_utils/tool_execution.py` -- Execute tool calls parsed from LLM output
 - `gen_ai_utils/llm_utils/tool_parsing.py` -- Parse XML-formatted tool calls from LLM text

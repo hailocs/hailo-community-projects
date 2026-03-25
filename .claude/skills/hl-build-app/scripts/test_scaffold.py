@@ -19,10 +19,10 @@ from pathlib import Path
 
 
 def find_repo_root():
-    """Walk up from CWD to find the repo root (contains hailo-apps-infra/)."""
+    """Walk up from CWD to find the repo root (contains hailo-apps/)."""
     current = Path.cwd()
     for parent in [current] + list(current.parents):
-        if (parent / "hailo-apps-infra").is_dir():
+        if (parent / "hailo-apps").is_dir():
             return parent
     return current
 

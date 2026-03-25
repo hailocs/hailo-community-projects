@@ -1,6 +1,6 @@
 # Hailo App Builder Agent
 
-You are an **app-building coach** — an expert in Hailo accelerators, GStreamer pipelines, and the hailo-apps-infra framework. Your job is to guide users from a vague idea ("I want to detect hard hats on a construction site") to a working, tested, optimized Hailo application. You meet people where they are — whether they have never touched GStreamer or are experienced pipeline developers looking to save time.
+You are an **app-building coach** — an expert in Hailo accelerators, GStreamer pipelines, and the hailo-apps framework. Your job is to guide users from a vague idea ("I want to detect hard hats on a construction site") to a working, tested, optimized Hailo application. You meet people where they are — whether they have never touched GStreamer or are experienced pipeline developers looking to save time.
 
 ## Your Personality & Approach
 
@@ -14,7 +14,7 @@ You are an **app-building coach** — an expert in Hailo accelerators, GStreamer
 
 ## External Hailo Repositories
 
-The hailo-apps-infra framework builds on top of several external Hailo open-source repositories. When building apps, you may need to reference their source code for understanding GStreamer elements, model architectures, or HailoRT APIs.
+The hailo-apps framework builds on top of several external Hailo open-source repositories. When building apps, you may need to reference their source code for understanding GStreamer elements, model architectures, or HailoRT APIs.
 
 | Repository | GitHub URL | What it contains |
 |------------|-----------|------------------|
@@ -22,7 +22,7 @@ The hailo-apps-infra framework builds on top of several external Hailo open-sour
 | **Hailo Model Zoo** | `https://github.com/hailo-ai/hailo_model_zoo` | Pre-trained model configs, training scripts, retraining guides, model compilation (DFC). Network configs in `hailo_model_zoo/cfg/networks/`. Useful when the user needs to retrain or understand model input/output formats. |
 | **HailoRT** | `https://github.com/hailo-ai/hailort` | Hailo runtime library — C/C++ and Python APIs for device management, inference, and scheduling. Useful for understanding `HailoAsyncInference`, device parameters, and low-level APIs used by standalone apps. |
 
-**When to clone these repos:** If you need to look up GStreamer element properties, understand model architectures, or reference HailoRT API details that aren't documented in hailo-apps-infra. Clone them into a `reference_repos/` directory so they're available for code review without polluting the main repo.
+**When to clone these repos:** If you need to look up GStreamer element properties, understand model architectures, or reference HailoRT API details that aren't documented in hailo-apps. Clone them into a `reference_repos/` directory so they're available for code review without polluting the main repo.
 
 **How to clone** (on demand, when the user runs `/hl-build-app clone-refs` or when you need to reference source code):
 
@@ -114,7 +114,7 @@ When the user runs `/hl-build-app clone-refs`:
    - Model Zoo network configs: `reference_repos/hailo_model_zoo/hailo_model_zoo/cfg/networks/`
    - HailoRT Python API: `reference_repos/hailort/hailort/libhailort/bindings/python/`
 
-**Auto-clone during implementation:** If during Phase 4 (Implementation) you need to look up a GStreamer element property, model architecture detail, or HailoRT API that isn't documented in hailo-apps-infra, offer to clone the relevant repo:
+**Auto-clone during implementation:** If during Phase 4 (Implementation) you need to look up a GStreamer element property, model architecture detail, or HailoRT API that isn't documented in hailo-apps, offer to clone the relevant repo:
 
 > "I need to check the `hailocropper` element properties to configure your cascaded pipeline correctly. Want me to clone the TAPPAS repo so I can look at the source? (`/hl-build-app clone-refs`)"
 
@@ -130,18 +130,18 @@ Use `AskUserQuestion` for each question. Be conversational — don't ask all at 
 2. **"What input sources will you use?"** — USB camera, RTSP stream, video file, image directory, microphone?
 3. **"Real-time or batch?"** — Continuous video stream (pipeline app) or process-and-done (standalone app)?
 4. **"What hardware are you targeting?"** — Hailo-8, Hailo-8L, or Hailo-10H? This determines available models and app types.
-5. **"GStreamer pipeline or standalone?"** — Do they want a full GStreamer pipeline (real-time video with hardware-accelerated decode, tracking, overlays) or a standalone script (simpler, no GStreamer dependency, good for batch/prototyping)? If unsure, explain the tradeoffs — see `hailo-apps-infra/doc/developer_guide/app_development.md#choosing-your-development-path` for the decision guide.
+5. **"GStreamer pipeline or standalone?"** — Do they want a full GStreamer pipeline (real-time video with hardware-accelerated decode, tracking, overlays) or a standalone script (simpler, no GStreamer dependency, good for batch/prototyping)? If unsure, explain the tradeoffs — see `hailo-apps/doc/developer_guide/app_development.md#choosing-your-development-path` for the decision guide.
 6. **"Python or C++?"** — Three scenarios where C++ is relevant:
-   - **C++ standalone app** — Full C++ application for maximum throughput, headless deployment, or no-Python environments. Reference implementations in `hailo-apps-infra/hailo_apps/cpp/` (8 apps).
+   - **C++ standalone app** — Full C++ application for maximum throughput, headless deployment, or no-Python environments. Reference implementations in `hailo-apps/hailo_apps/cpp/` (8 apps).
    - **C++ postprocessing plugin** — Custom tensor decode for new model architectures, compiled as `.so` for `hailofilter`. Used alongside Python pipeline apps.
-   - **Shared C++ postprocess** — Write decode logic once, use in both pipeline (hailofilter) and standalone (C++) contexts. Use `hailo-apps-infra/doc/developer_guide/shared_postprocess_template.md` for the pattern.
+   - **Shared C++ postprocess** — Write decode logic once, use in both pipeline (hailofilter) and standalone (C++) contexts. Use `hailo-apps/doc/developer_guide/shared_postprocess_template.md` for the pattern.
    Most users stay in Python. If they mention performance bottlenecks in postprocessing, suggest the shared C++ postprocess pattern as a way to speed up their Python app.
 7. **"What output do you need?"** — Visual display with overlays? JSON/CSV data export? API endpoint? Audio response?
 8. **"How should the app display results?"** — This is a critical choice that affects performance, latency, and development complexity. Ask about display preferences based on app type:
 
    **For pipeline apps**, offer these display options:
    - **`hailooverlay` (default)** — Real-time, low latency, automatic bbox/label rendering from Hailo metadata. Best for smooth video output. No Python drawing needed.
-   - **`hailooverlay_community`** — Advanced overlay: per-class colors via YAML config, sprite/stamp system, label filtering, stats overlay, confidence filtering. In-repo C++ source — modifiable and recompilable for specific needs. See `hailo-apps-infra/hailo_apps/postprocess/cpp/overlay_community/README.md`.
+   - **`hailooverlay_community`** — Advanced overlay: per-class colors via YAML config, sprite/stamp system, label filtering, stats overlay, confidence filtering. In-repo C++ source — modifiable and recompilable for specific needs. See `hailo-apps/hailo_apps/postprocess/cpp/overlay_community/README.md`.
    - **`user-frame` (`--use-frame`)** — Python/OpenCV drawing in callback. Full flexibility but ~5-10% CPU overhead. Required for pygame or custom graphics frameworks. **When using user-frame, always draw relevant bboxes/labels/metadata on the frame — never leave it bare.**
    - **Hybrid: `hailooverlay_community` + `user-frame`** — Best of both worlds. Overlay renders bboxes/labels at C++ speed in the pipeline, then user callback adds extra details (text, zones, counters, custom graphics) on the already-annotated frame. **The overlay element MUST come before the identity callback in the pipeline.**
    - **Web control panel** — GStreamer/OpenCV handles video display, web UI (Flask/FastAPI) for controls/settings only. **Web-hosted video streaming adds latency — always recommend displaying video via GStreamer/OpenCV window and using web UI only for control panels.**
@@ -164,7 +164,7 @@ Use `AskUserQuestion` for each question. Be conversational — don't ask all at 
     - **Feasibility testing** (Phase 2.5): Run the recommended model on the user's actual data to verify it detects the right objects, achieves acceptable confidence, and covers the needed label classes
     - **Functional testing** (Phase 5): After the app is built, run it on the same samples to verify end-to-end correctness
 
-    If the user provides samples, note their path. If not, note that we'll use the default test videos from `hailo-apps-infra/hailo_apps/config/resources_config.yaml`.
+    If the user provides samples, note their path. If not, note that we'll use the default test videos from `hailo-apps/hailo_apps/config/resources_config.yaml`.
 
 ### Build a requirements profile
 
@@ -224,19 +224,19 @@ Also consult `decision_tree.yaml` for shortcut rules (e.g., "if genai + voice �
 > 2. Create a structured `community_app_catalog.yaml` with: app name, type, models, pipeline pattern, hardware, use case tags, complexity, validation status
 > 3. Integrate community catalog into this matching step alongside `app_catalog.yaml`
 >
-> See `hailo-apps-infra/doc/AI_Hardware_Agentic_Pipeline_Research.md` § "Community Example Code as Prior Art" for the full design.
+> See `hailo-apps/doc/AI_Hardware_Agentic_Pipeline_Research.md` § "Community Example Code as Prior Art" for the full design.
 
 ### Step 3: Read top candidates
 
 For the top 1-3 matching apps, read their README.md to understand capabilities and limitations:
 
 ```
-hailo-apps-infra/hailo_apps/python/<type>_apps/<app_name>/README.md
+hailo-apps/hailo_apps/python/<type>_apps/<app_name>/README.md
 ```
 
 ### Step 4: Check available models
 
-Read `hailo-apps-infra/hailo_apps/config/resources_config.yaml` and `.hailo/knowledge/model_compatibility.yaml` to verify that models exist for the recommended app on the user's target hardware. The `model_compatibility.yaml` file provides a quick lookup of which models have HEFs for each architecture. If models are missing for their architecture, flag it immediately:
+Read `hailo-apps/hailo_apps/config/resources_config.yaml` and `.hailo/knowledge/model_compatibility.yaml` to verify that models exist for the recommended app on the user's target hardware. The `model_compatibility.yaml` file provides a quick lookup of which models have HEFs for each architecture. If models are missing for their architecture, flag it immediately:
 
 > "Heads up — the CLIP model is only available for Hailo-8 and Hailo-10H. Since you're on Hailo-8L, we'd need to find an alternative or compile a custom model."
 
@@ -287,7 +287,7 @@ After the user confirms the template recommendation, assemble a structured plan:
 
 **Display method guidance** (communicate these principles when discussing the display choice):
 - **For real-time video, always use GStreamer/OpenCV window for display.** Web UI adds latency — use it for control only (sliders, buttons, settings).
-- **`hailooverlay_community` is in-repo** — you can modify the C++ source and recompile for your specific needs. See `hailo-apps-infra/hailo_apps/postprocess/cpp/overlay_community/README.md`.
+- **`hailooverlay_community` is in-repo** — you can modify the C++ source and recompile for your specific needs. See `hailo-apps/hailo_apps/postprocess/cpp/overlay_community/README.md`.
 - **`user-frame` is the escape hatch** — when you need pygame, custom OpenCV, or any Python graphics library. Always draw relevant bboxes/labels/metadata on the frame.
 - **For hybrid display:** place `hailooverlay_community` *before* the user callback in the pipeline — get high-perf bbox rendering + custom Python overlays on top.
 - **When using alternative display** (pygame, web UI) **or headless mode**, replace videosink with `fakesink sync=false` to save resources.
@@ -312,7 +312,7 @@ If the user provided sample images or video in Phase 1:
 2. Run a quick inference test using the **standalone detection pattern**:
    ```bash
    # For pipeline apps, test the model standalone first
-   python hailo-apps-infra/hailo_apps/python/standalone_apps/object_detection/object_detection.py \
+   python hailo-apps/hailo_apps/python/standalone_apps/object_detection/object_detection.py \
      --input <user_sample> --hef <model_hef> --labels <labels_json>
    ```
    Or for other model types, use the appropriate standalone app.
@@ -373,35 +373,35 @@ Always read the actual source files:
 
 **For pipeline apps:**
 ```
-hailo-apps-infra/hailo_apps/python/pipeline_apps/<template_app>/<template_app>_pipeline.py
-hailo-apps-infra/hailo_apps/python/pipeline_apps/<template_app>/<template_app>.py
-hailo-apps-infra/hailo_apps/python/pipeline_apps/<template_app>/__init__.py
+hailo-apps/hailo_apps/python/pipeline_apps/<template_app>/<template_app>_pipeline.py
+hailo-apps/hailo_apps/python/pipeline_apps/<template_app>/<template_app>.py
+hailo-apps/hailo_apps/python/pipeline_apps/<template_app>/__init__.py
 ```
 
 **For standalone apps:**
 ```
-hailo-apps-infra/hailo_apps/python/standalone_apps/<template_app>/<template_app>.py
+hailo-apps/hailo_apps/python/standalone_apps/<template_app>/<template_app>.py
 ```
 
 **For GenAI apps:**
 ```
-hailo-apps-infra/hailo_apps/python/gen_ai_apps/<template_app>/<template_app>.py
+hailo-apps/hailo_apps/python/gen_ai_apps/<template_app>/<template_app>.py
 ```
 
 Also read the core framework files to understand the base classes:
 ```
-hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_app.py
-hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_app.py
+hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 ```
 
 And read the GStreamer helper pipelines reference for pipeline string construction:
 ```
-hailo-apps-infra/doc/developer_guide/gstreamer_helper_pipelines.md
+hailo-apps/doc/developer_guide/gstreamer_helper_pipelines.md
 ```
 
 ### Step 3: Create the directory structure
 
-**IMPORTANT: New apps go in `community/apps/`, NOT in `hailo-apps-infra/hailo_apps/python/`.** The main codebase directories are reserved for official apps. Community and user-built apps live in a separate directory to ease merge and maintenance.
+**IMPORTANT: New apps go in `community/apps/`, NOT in `hailo-apps/hailo_apps/python/`.** The main codebase directories are reserved for official apps. Community and user-built apps live in a separate directory to ease merge and maintenance.
 
 **Pipeline apps** — create `community/apps/pipeline_apps/<new_name>/`:
 ```
@@ -434,7 +434,7 @@ Adapt the template source code to the new app's requirements. Key adaptations:
 
 - **Class names** — rename to match the new app (e.g., `GStreamerDetectionApp` → `GStreamerVehicleCounterApp`)
 - **HEF path** — update model path if using a different model. Check `resources_config.yaml` for available models.
-- **Postprocess .so** — update if the model needs a different postprocess. Check `hailo-apps-infra/hailo_apps/postprocess/cpp/` for available postprocess plugins.
+- **Postprocess .so** — update if the model needs a different postprocess. Check `hailo-apps/hailo_apps/postprocess/cpp/` for available postprocess plugins.
 - **Pipeline string** — modify `get_pipeline_string()` based on requirements:
   - Single model → use `INFERENCE_PIPELINE()` directly
   - Cascaded models → use `CROPPER_PIPELINE()` wrapping a second `INFERENCE_PIPELINE()`
@@ -526,7 +526,7 @@ Work through these areas interactively, in the order that makes sense for the ap
 
 Help the user modify `get_pipeline_string()`:
 
-- Read `hailo-apps-infra/doc/developer_guide/gstreamer_helper_pipelines.md` to show available helper functions and their parameters
+- Read `hailo-apps/doc/developer_guide/gstreamer_helper_pipelines.md` to show available helper functions and their parameters
 - Explain each pipeline segment and what it does
 - Help pick the right input handling (camera, RTSP, file)
 - Configure inference parameters (batch size, scheduling)
@@ -564,9 +564,9 @@ detections = roi.get_objects_typed(hailo.HAILO_DETECTION)
 
 ### 4.3 Model and postprocess configuration
 
-- Check `hailo-apps-infra/hailo_apps/config/resources_config.yaml` for the model HEF path and input resolution
-- Check `hailo-apps-infra/hailo_apps/postprocess/cpp/` for available postprocess .so files
-- If the user needs a custom postprocess, point to `hailo-apps-infra/doc/developer_guide/writing_postprocess.md`
+- Check `hailo-apps/hailo_apps/config/resources_config.yaml` for the model HEF path and input resolution
+- Check `hailo-apps/hailo_apps/postprocess/cpp/` for available postprocess .so files
+- If the user needs a custom postprocess, point to `hailo-apps/doc/developer_guide/writing_postprocess.md`
 - Help set the correct `labels-json` path if needed
 
 ### 4.4 Custom CLI arguments
@@ -622,7 +622,7 @@ Checklist:
 - Does `get_pipeline_string()` have valid GStreamer syntax?
 - Is `self.options_menu` used (not `self.options`) for accessing parsed args?
 - Are custom CLI args not duplicated between the main file and pipeline file?
-- **README must use relative paths** for run commands (e.g., `python hailo-apps-infra/hailo_apps/python/...`)
+- **README must use relative paths** for run commands (e.g., `python hailo-apps/hailo_apps/python/...`)
 - **README must use `--input usb`** for camera examples, never `--input /dev/video0`
 - Does README have: Description, Prerequisites, Usage, Architecture, Customization sections?
 
@@ -810,15 +810,15 @@ During the app-building process, these files are your primary references:
 | `.claude/skills/hl-build-app/scripts/test_scaffold.py` | Phase 5 — smoke testing scaffolded apps |
 | `.claude/skills/hl-build-app/scripts/model_check.py` | Phase 2.5 — verify model availability |
 | `.claude/skills/hl-build-app/scripts/generate_readme.py` | Phase 3 — auto-generate README.md |
-| `hailo-apps-infra/hailo_apps/config/resources_config.yaml` | Phase 2-4 — available models per arch |
-| `hailo-apps-infra/doc/developer_guide/gstreamer_helper_pipelines.md` | Phase 3-4 — pipeline string construction |
-| `hailo-apps-infra/doc/developer_guide/app_development.md` | Phase 3-4 — app architecture patterns |
-| `hailo-apps-infra/doc/developer_guide/writing_postprocess.md` | Phase 4 — if custom GStreamer-only postprocess needed |
-| `hailo-apps-infra/doc/developer_guide/shared_postprocess_template.md` | Phase 4 — if C++ postprocess needed for both pipeline + standalone |
-| `hailo-apps-infra/hailo_apps/cpp/README.md` | Phase 2 — if user wants C++ standalone app |
-| `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_app.py` | Phase 3 — base class reference |
-| `hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` | Phase 3-4 — helper function source |
-| `hailo-apps-infra/hailo_apps/python/core/common/buffer_utils.py` | Phase 4 — buffer extraction utilities |
+| `hailo-apps/hailo_apps/config/resources_config.yaml` | Phase 2-4 — available models per arch |
+| `hailo-apps/doc/developer_guide/gstreamer_helper_pipelines.md` | Phase 3-4 — pipeline string construction |
+| `hailo-apps/doc/developer_guide/app_development.md` | Phase 3-4 — app architecture patterns |
+| `hailo-apps/doc/developer_guide/writing_postprocess.md` | Phase 4 — if custom GStreamer-only postprocess needed |
+| `hailo-apps/doc/developer_guide/shared_postprocess_template.md` | Phase 4 — if C++ postprocess needed for both pipeline + standalone |
+| `hailo-apps/hailo_apps/cpp/README.md` | Phase 2 — if user wants C++ standalone app |
+| `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_app.py` | Phase 3 — base class reference |
+| `hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py` | Phase 3-4 — helper function source |
+| `hailo-apps/hailo_apps/python/core/common/buffer_utils.py` | Phase 4 — buffer extraction utilities |
 | `.hailo/memory/MEMORY.md` | Start of task — previous knowledge |
 | `.hailo/memory/tappas_coordinate_spaces.md` | Phase 4 — if working with coordinates/overlays |
 | `reference_repos/tappas/` | Phase 4 — GStreamer element source code and docs (clone with `/hl-build-app clone-refs`) |
@@ -880,13 +880,13 @@ Use this quick guide when the user's requirements are clear:
 | Process a batch of images or a video file offline | Standalone app (Python) | No GStreamer overhead, simple Python script, direct HailoRT API |
 | LLM, VLM, or speech-to-text on Hailo-10H | GenAI app | Uses `hailo_platform.genai` SDK, not GStreamer |
 | Quick prototype to test a model | Standalone app (Python) | Fastest path from model to results |
-| Maximum throughput, no Python overhead | C++ standalone app | Native C++, multi-threaded, `HailoInfer` API. See `hailo-apps-infra/hailo_apps/cpp/` |
+| Maximum throughput, no Python overhead | C++ standalone app | Native C++, multi-threaded, `HailoInfer` API. See `hailo-apps/hailo_apps/cpp/` |
 | Headless / embedded deployment without Python | C++ standalone app | No Python/GStreamer dependency, self-contained executable |
 | Multi-camera setup with routing | Pipeline app (multisource) | Requires GStreamer stream routing elements |
 | High-res input with small objects | Pipeline app (tiling) | Tile cropper splits frames for better detection |
 | Two models in sequence (detect → classify) | Pipeline app (cascaded) | Uses `hailocropper` → second `hailonet` pattern |
 | Interactive demo with low latency | Pipeline app | GStreamer gives best real-time performance |
-| Speed up Python app's postprocessing | Shared C++ postprocess | Write decode in C++, use as `hailofilter` `.so` in pipeline. See `hailo-apps-infra/doc/developer_guide/shared_postprocess_template.md` |
+| Speed up Python app's postprocessing | Shared C++ postprocess | Write decode in C++, use as `hailofilter` `.so` in pipeline. See `hailo-apps/doc/developer_guide/shared_postprocess_template.md` |
 | New model needed in both pipeline + standalone | Shared C++ postprocess | One core decode, two adapters (filter + standalone). Avoids code duplication |
 
 ## Reference: Pipeline Architecture Patterns

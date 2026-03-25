@@ -1,6 +1,6 @@
 # Skill: Model Management & HEF Resolution
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Manage HEF model files, resolve paths, and configure model resources.
 
@@ -84,7 +84,7 @@ name = get_default_model_name("vlm_chat", "hailo10h")  # "Qwen2-VL-2B-Instruct"
 ## Adding a New App to resources_config.yaml
 
 ```yaml
-# In hailo-apps-infra/hailo_apps/config/resources_config.yaml
+# In hailo-apps/hailo_apps/config/resources_config.yaml
 my_new_app:
   models:
     hailo10h:

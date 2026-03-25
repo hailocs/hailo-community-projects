@@ -1,6 +1,6 @@
 # Skill: Create Agent Application with Tool Calling
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Build an AI agent that uses Hailo LLM for reasoning and can execute tools/actions.
 
@@ -12,7 +12,7 @@
 
 ## Reference Implementation
 
-Study `hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/` thoroughly:
+Study `hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/` thoroughly:
 - `agent.py` — `AgentApp` class with tool-calling loop
 - `tools/base.py` — `BaseTool` abstract class and `ToolResult` dataclass
 - `tools/weather/`, `tools/servo/`, etc. — Example tool implementations

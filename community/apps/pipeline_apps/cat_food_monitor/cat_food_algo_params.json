@@ -1,5 +1,0 @@
-{
-    "skip_frames": 15,
-    "lance_db_vector_search_classificaiton_confidence_threshold": 0.55,
-    "batch_size": 1
-}

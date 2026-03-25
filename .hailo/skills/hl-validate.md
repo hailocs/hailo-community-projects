@@ -1,6 +1,6 @@
 # Skill: Validate and Test
 
-> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps-infra/`. Framework code is READ from `hailo-apps-infra/hailo_apps/`. See the repo root CLAUDE.md for details.
+> **Two-repo context:** New apps go in `community/apps/`, not in `hailo-apps/`. Framework code is READ from `hailo-apps/hailo_apps/`. See the repo root CLAUDE.md for details.
 
 > Systematic validation skill for verifying that agent-built code is correct, convention-compliant, and production-ready. Used at every phase gate in the plan-and-execute loop.
 
@@ -21,14 +21,14 @@ Verify the file structure exists and is correctly organized.
 
 ```bash
 # Check directory exists
-ls -la hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/
+ls -la hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/
 
 # Check __init__.py
-test -f hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/__init__.py && echo "PASS" || echo "FAIL"
+test -f hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/__init__.py && echo "PASS" || echo "FAIL"
 
 # Check all expected files exist
 for f in __init__.py main_module.py support_module.py README.md; do
-  test -f hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/$f && echo "PASS: $f" || echo "FAIL: $f"
+  test -f hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/$f && echo "PASS: $f" || echo "FAIL: $f"
 done
 ```
 
@@ -84,7 +84,7 @@ print('Instantiation OK')
 Run the convention checklist on each file:
 
 ```bash
-FILE="hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app>/<module>.py"
+FILE="hailo-apps/hailo_apps/python/gen_ai_apps/<app>/<module>.py"
 
 echo "=== Convention Check: $FILE ==="
 
@@ -116,8 +116,8 @@ echo "INFO: $TYPED/$FUNCS functions have return type hints"
 
 ```
 Use the get_errors tool on each new/modified file:
-  get_errors(["hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app>/module_a.py",
-              "hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app>/module_b.py"])
+  get_errors(["hailo-apps/hailo_apps/python/gen_ai_apps/<app>/module_a.py",
+              "hailo-apps/hailo_apps/python/gen_ai_apps/<app>/module_b.py"])
 
 Expected: No errors.
 Acceptable: Warnings about unused imports (if __all__ is defined).
@@ -136,7 +136,7 @@ runSubagent:
   prompt: |
     ## Task
     Run a full validation suite on the newly created app at
-    hailo-apps-infra/hailo_apps/python/gen_ai_apps/<app_name>/
+    hailo-apps/hailo_apps/python/gen_ai_apps/<app_name>/
 
     ## Checks to Run (in order)
 

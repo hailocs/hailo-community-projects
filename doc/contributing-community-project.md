@@ -36,7 +36,7 @@ New apps are scaffolded automatically in `community/apps/<type>_apps/<your_app>/
    source setup_env.sh
    ```
 
-2. **Choose a template app** from `hailo-apps-infra/hailo_apps/python/pipeline_apps/` (or `standalone_apps/` or `gen_ai_apps/`)
+2. **Choose a template app** from `hailo-apps/hailo_apps/python/pipeline_apps/` (or `standalone_apps/` or `gen_ai_apps/`)
 
 3. **Create your app directory:**
    ```bash
@@ -97,7 +97,7 @@ For standalone projects that don't fit the `community/apps/` structure (games, r
 2. Provide a `download_resources.sh` script to automate the download
 3. For custom post-processing:
    - Add the code and a compilation script
-   - See [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) for guidance on creating and compiling post-processes
+   - See [hailo-apps](https://github.com/hailo-ai/hailo-apps) for guidance on creating and compiling post-processes
 
 ---
 

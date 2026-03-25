@@ -21,10 +21,10 @@ Copy and paste the following prompt into GitHub Copilot Chat to build the entire
 5. **Minimize tool calls** — read files in parallel batches, create all files, validate once.
 
 ### Reference files to read (and ONLY these):
-- `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py` — Camera init pattern, main loop reference
-- `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py` — Backend class to reuse
-- `hailo-apps-infra/hailo_apps/python/core/common/defines.py` — Where to register the app constant + existing constants
-- `hailo-apps-infra/hailo_apps/python/core/common/parser.py` — `get_standalone_parser()` signature
+- `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/vlm_chat.py` — Camera init pattern, main loop reference
+- `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py` — Backend class to reuse
+- `hailo-apps/hailo_apps/python/core/common/defines.py` — Where to register the app constant + existing constants
+- `hailo-apps/hailo_apps/python/core/common/parser.py` — `get_standalone_parser()` signature
 
 ### Workflow:
 1. Read the 4 reference files above (in parallel)
@@ -51,8 +51,8 @@ Copy and paste the following prompt into GitHub Copilot Chat to build the entire
 ### Technical requirements:
 
 - Place the app in `community/apps/gen_ai_apps/dog_monitor_flat/`
-- **Reuse the `Backend` class** from `hailo_apps.python.gen_ai_apps.vlm_chat.backend` (source in `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py`) — import it directly, don't copy it
-- Register `DOG_MONITOR_FLAT_APP = "dog_monitor_flat"` in `hailo-apps-infra/hailo_apps/python/core/common/defines.py`
+- **Reuse the `Backend` class** from `hailo_apps.python.gen_ai_apps.vlm_chat.backend` (source in `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py`) — import it directly, don't copy it
+- Register `DOG_MONITOR_FLAT_APP = "dog_monitor_flat"` in `hailo-apps/hailo_apps/python/core/common/defines.py`
 - Use `get_standalone_parser()` for CLI arguments, add `--interval`, `--save-events`, and `--events-dir` arguments
 - Use `resolve_hef_path()` with `DOG_MONITOR_FLAT_APP` and `HAILO10H_ARCH` for model resolution
 - Use `get_logger(__name__)` for all logging

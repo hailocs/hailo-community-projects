@@ -1,3 +1,4 @@
-[submodule "hailo-apps-infra"]
-	path = hailo-apps-infra
-	url = https://github.com/hailo-ai/hailo-apps-infra.git
+[submodule "hailo-apps"]
+	path = hailo-apps
+	url = https://github.com/hailocs/hailo-apps-internal.git
+	branch = dev

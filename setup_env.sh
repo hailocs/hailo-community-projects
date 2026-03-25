@@ -49,11 +49,11 @@ check_kernel_version || {
 # --- Project root ---
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# --- PYTHONPATH: project root + hailo-apps-infra ---
-export PYTHONPATH="${PROJECT_ROOT}:${PROJECT_ROOT}/hailo-apps-infra:${PYTHONPATH:-}"
+# --- PYTHONPATH: project root + hailo-apps ---
+export PYTHONPATH="${PROJECT_ROOT}:${PROJECT_ROOT}/hailo-apps:${PYTHONPATH:-}"
 echo "PYTHONPATH set:"
 echo "  ${PROJECT_ROOT}"
-echo "  ${PROJECT_ROOT}/hailo-apps-infra"
+echo "  ${PROJECT_ROOT}/hailo-apps"
 
 # --- Activate virtual environment ---
 if [ -d "${PROJECT_ROOT}/${VENV_NAME}" ] || [ -L "${PROJECT_ROOT}/${VENV_NAME}" ]; then

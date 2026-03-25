@@ -18,8 +18,8 @@ except ImportError:
 
 TEST_RUN_TIME = 10
 
-# Pipeline apps are now in the hailo-apps-infra submodule
-PIPELINE_APPS_DIR = "hailo-apps-infra/hailo_apps/python/pipeline_apps"
+# Pipeline apps are now in the hailo-apps submodule
+PIPELINE_APPS_DIR = "hailo-apps/hailo_apps/python/pipeline_apps"
 
 
 def test_rpi_camera_connection():

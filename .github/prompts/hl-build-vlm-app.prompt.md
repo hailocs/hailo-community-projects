@@ -11,12 +11,12 @@ You are building a new VLM application variant in the hailo-apps repository. Fol
 2. `.hailo/skills/hl-build-vlm-app.md` — VLM app skill
 3. `.hailo/toolsets/vlm-backend-api.md` — Backend API
 4. `.hailo/toolsets/hailo-sdk.md` — SDK reference
-5. `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/` — Reference implementation
+5. `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/` — Reference implementation
 
 ### Build Steps
 1. Create directory: `community/apps/gen_ai_apps/{app_name}/`
 2. Add `__init__.py` (empty)
-3. Reuse or adapt `Backend` from `hailo_apps.python.gen_ai_apps.vlm_chat.backend` (source in `hailo-apps-infra/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py`)
+3. Reuse or adapt `Backend` from `hailo_apps.python.gen_ai_apps.vlm_chat.backend` (source in `hailo-apps/hailo_apps/python/gen_ai_apps/vlm_chat/backend.py`)
 4. Create main app file with:
    - Proper imports (absolute)
    - CLI parser using `get_standalone_parser()`

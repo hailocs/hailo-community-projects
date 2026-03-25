@@ -1,12 +1,12 @@
 # Hailo Community Projects
 
-Community-contributed AI applications for Hailo edge accelerators, built on top of [hailo-apps-infra](https://github.com/hailo-ai/hailo-apps-infra) (included as a git submodule).
+Community-contributed AI applications for Hailo edge accelerators, built on top of [hailo-apps](https://github.com/hailo-ai/hailo-apps) (included as a git submodule).
 
 ## Two-Repo Layout
 
 ```
 hailo-community-projects/          ← THIS REPO (community hub)
-├── hailo-apps-infra/              ← Git submodule (core framework, READ-ONLY)
+├── hailo-apps/              ← Git submodule (core framework, READ-ONLY)
 │   ├── hailo_apps/                # Core Python/C++ framework
 │   └── ...
 ├── community/                     ← COMMUNITY APPS (write here)
@@ -30,13 +30,17 @@ hailo-community-projects/          ← THIS REPO (community hub)
 └── community_projects/            # Legacy community projects
 ```
 
-**Rule:** READ from `hailo-apps-infra/hailo_apps/...` for framework code. WRITE new apps to `community/apps/`.
+**Rule:** READ from `hailo-apps/hailo_apps/...` for framework code. WRITE new apps to `community/apps/`.
+
+## HailoDocs MCP
+
+The `hailo-docs` MCP server provides access to official Hailo documentation (Hailo Developer Zone, Dataflow Compiler, HailoRT, TAPPAS, Model Zoo, etc.). Use it when you need to look up Hailo APIs, HEF model details, GStreamer element properties, hardware specs, or any Hailo-specific technical information. **Always prefer querying hailo-docs over guessing Hailo-specific details.**
 
 ## Quick Reference
 
 ```bash
 source setup_env.sh                    # Activate environment (always do this first)
-./install.sh                           # Full install (delegates to hailo-apps-infra)
+./install.sh                           # Full install (delegates to hailo-apps)
 git submodule update --init --recursive # Initialize submodule only
 ```
 

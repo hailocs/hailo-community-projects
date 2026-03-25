@@ -9,7 +9,7 @@ A door-camera security application built on the face recognition pipeline. It mo
 - **Hardware:** Hailo-8 (also supports Hailo-8L and Hailo-10H)
 - **Models:** SCRFD face detection + ArcFace MobileFaceNet recognition (downloaded via `hailo-download-resources`)
 - **Postprocess plugins:** Compiled via `hailo-compile-postprocess`
-- **Python dependencies:** Standard hailo-apps-infra environment (`source setup_env.sh`)
+- **Python dependencies:** Standard hailo-apps environment (`source setup_env.sh`)
 
 ## How to Run
 

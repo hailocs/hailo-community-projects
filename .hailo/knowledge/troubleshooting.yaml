@@ -15,7 +15,7 @@ entries:
     cause: "The HEF model file has not been downloaded or the path is incorrect. Models are not bundled with the repo -- they must be downloaded via resources_config.yaml."
     fix: |
       1. Run `hailo-download-resources` to download all configured HEF files.
-      2. Verify the model name matches an entry in hailo-apps-infra/hailo_apps/config/resources_config.yaml.
+      2. Verify the model name matches an entry in hailo-apps/hailo_apps/config/resources_config.yaml.
       3. If using --hef-path, check the path exists: `ls -la <hef_path>`.
       4. Use --list-models to see available models for your app and architecture.
     phase: "Phase 5 (Testing)"
@@ -53,7 +53,7 @@ entries:
       1. Run `hailo-compile-postprocess` to build all C++ postprocess plugins.
       2. Verify the .so filename matches what's in your pipeline class (e.g., libyolo_hailortpp_postprocess.so).
       3. Check that RESOURCES_SO_DIR_NAME is correctly imported and used in get_resource_path().
-      4. Run: find hailo-apps-infra/ -name "*.so" | grep <your_postprocess_name>
+      4. Run: find hailo-apps/ -name "*.so" | grep <your_postprocess_name>
     phase: "Phase 5 (Testing)"
     app_types: [pipeline]
 
@@ -111,7 +111,7 @@ entries:
 
   - error: "ModuleNotFoundError: No module named 'hailo_apps'"
     symptom: "ImportError when running the app, hailo_apps package not found"
-    cause: "PYTHONPATH does not include the hailo-apps-infra directory. setup_env.sh sets this automatically."
+    cause: "PYTHONPATH does not include the hailo-apps directory. setup_env.sh sets this automatically."
     fix: |
       1. Run: source setup_env.sh
       2. Verify: python3 -c "import hailo_apps; print(hailo_apps.__file__)"

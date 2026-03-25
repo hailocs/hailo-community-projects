@@ -18,7 +18,7 @@ Standalone apps are lightweight Python scripts that use the HailoRT API directly
 
 ## File Structure
 
-A standalone app lives in `hailo-apps-infra/hailo_apps/python/standalone_apps/<your_app>/`:
+A standalone app lives in `hailo-apps/hailo_apps/python/standalone_apps/<your_app>/`:
 
 ```
 your_app/

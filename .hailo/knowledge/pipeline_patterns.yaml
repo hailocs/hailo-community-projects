@@ -349,8 +349,8 @@ display_patterns:
     when_to_use: "When you need per-detection colors, sprite overlays, label filtering, confidence thresholds, or stats display."
     notes: |
       Drop-in replacement for standard hailooverlay with many more features.
-      In-repo C++ source at hailo-apps-infra/hailo_apps/postprocess/cpp/overlay_community/ — modifiable and recompilable.
-      See hailo-apps-infra/hailo_apps/postprocess/cpp/overlay_community/README.md for full documentation.
+      In-repo C++ source at hailo-apps/hailo_apps/postprocess/cpp/overlay_community/ — modifiable and recompilable.
+      See hailo-apps/hailo_apps/postprocess/cpp/overlay_community/README.md for full documentation.
       Key properties: use-custom-colors, style-config, sprite-config, min-confidence, show-labels, hide-labels, stats-overlay, text-background.
 
   # --- User-frame display (Python/OpenCV drawing) ---
@@ -441,74 +441,74 @@ helper_functions:
   SOURCE_PIPELINE:
     purpose: "Creates video source pipeline for camera, file, RTSP, or screen capture"
     key_params: [video_source, video_width, video_height, frame_rate, sync, no_webcam_compression, mirror_image]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   INFERENCE_PIPELINE:
     purpose: "Creates hailonet + hailofilter pipeline for model inference and postprocessing"
     key_params: [hef_path, post_process_so, post_function_name, batch_size, config_json, additional_params, scheduler_timeout_ms, scheduler_priority, vdevice_group_id, multi_process_service]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   INFERENCE_PIPELINE_WRAPPER:
     purpose: "Wraps inference in hailocropper+hailoaggregator for resolution preservation"
     key_params: [inner_pipeline, bypass_max_size_buffers, name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   DISPLAY_PIPELINE:
     purpose: "Creates hailooverlay + video sink for visualization"
     key_params: [video_sink, sync, show_fps, name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   TRACKER_PIPELINE:
     purpose: "Creates hailotracker element for object tracking across frames"
     key_params: [class_id, kalman_dist_thr, iou_thr, init_iou_thr, keep_new_frames, keep_tracked_frames, keep_lost_frames, keep_past_metadata, name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   CROPPER_PIPELINE:
     purpose: "Wraps inference in hailocropper+hailoaggregator for cascaded detection-then-classify"
     key_params: [inner_pipeline, so_path, function_name, use_letterbox, no_scaling_bbox, internal_offset, bypass_max_size_buffers, name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   TILE_CROPPER_PIPELINE:
     purpose: "Wraps inference in hailotilecropper+hailotileaggregator for tiled processing"
     key_params: [inner_pipeline, tiles_along_x_axis, tiles_along_y_axis, overlap_x_axis, overlap_y_axis, tiling_mode, scale_level, iou_threshold, border_threshold, name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   USER_CALLBACK_PIPELINE:
     purpose: "Creates identity element for Python callback invocation"
     key_params: [name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   QUEUE:
     purpose: "Creates a GStreamer queue element for buffering"
     key_params: [name, max_size_buffers, max_size_bytes, max_size_time, leaky]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   OVERLAY_PIPELINE:
     purpose: "Creates hailooverlay element for drawing bounding boxes and labels"
     key_params: [name]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   FILE_SINK_PIPELINE:
     purpose: "Creates pipeline for saving video to .mkv file"
     key_params: [output_file, name, bitrate]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   VIDEO_STREAM_PIPELINE:
     purpose: "Creates pipeline for UDP video streaming"
     key_params: [port, host, bitrate]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   VIDEO_SHMSINK_PIPELINE:
     purpose: "Creates shared memory video sink pipeline"
     key_params: [socket_path]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   VIDEO_SHMSRC_PIPELINE:
     purpose: "Creates shared memory video source pipeline"
     key_params: [socket_path]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
 
   get_source_type:
     purpose: "Determines source type (usb, rpi, rtsp, file, etc.) from input string"
     key_params: [input_source]
-    source_file: hailo-apps-infra/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py
+    source_file: hailo-apps/hailo_apps/python/core/gstreamer/gstreamer_helper_pipelines.py

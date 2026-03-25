@@ -9,8 +9,8 @@ You are adding a new tool to the agent tools framework in hailo-apps.
 ### Required Context (Read These First)
 1. `.hailo/skills/hl-build-agent-app.md` — Agent app skill
 2. `.hailo/toolsets/gen-ai-utilities.md` — Gen AI utilities reference
-3. `hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/base.py` — Tool base class
-4. `hailo-apps-infra/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/weather/` — Example tool
+3. `hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/base.py` — Tool base class
+4. `hailo-apps/hailo_apps/python/gen_ai_apps/agent_tools_example/tools/weather/` — Example tool
 
 ### Build Steps
 1. Create tool directory: `community/apps/gen_ai_apps/agent_tools_example/tools/{tool_name}/`

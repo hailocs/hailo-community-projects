@@ -1,7 +1,7 @@
 # Audio & Microphone Issues (Multi-Machine)
 
 ## AudioPlayer Race Conditions (voice_assistant)
-File: `hailo-apps-infra/hailo_apps/python/gen_ai_apps/voice_assistant/audio_player.py`
+File: `hailo-apps/hailo_apps/python/gen_ai_apps/voice_assistant/audio_player.py`
 
 ### Core Problem
 Audio output stops after several iterations due to queue items being lost during stream reinit.

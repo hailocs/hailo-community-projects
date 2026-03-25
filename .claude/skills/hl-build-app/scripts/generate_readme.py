@@ -130,7 +130,7 @@ def generate_readme(app_dir, app_name, app_type):
     lines.append("## Prerequisites")
     lines.append("")
     lines.append("- Hailo accelerator (Hailo-8, Hailo-8L, or Hailo-10H)")
-    lines.append("- hailo-apps-infra framework installed")
+    lines.append("- hailo-apps framework installed")
     lines.append("- Environment activated: `source setup_env.sh`")
     if app_type == "genai":
         lines.append("- Hailo-10H hardware (GenAI SDK required)")
